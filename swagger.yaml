@@ -1,0 +1,91 @@
+definitions:
+  User:
+    description: User defines the structure for an API User
+    properties:
+      Id:
+        description: the id of the user
+        format: int64
+        minimum: 1
+        type: integer
+      email:
+        description: the email of the user
+        maxLength: 255
+        type: string
+        x-go-name: Email
+      groupId:
+        description: the id of the group that the user belongs to
+        format: int64
+        minimum: 1
+        type: integer
+        x-go-name: GroupId
+      name:
+        description: the name of the user
+        maxLength: 255
+        type: string
+        x-go-name: Name
+      password:
+        description: the password of the user
+        maxLength: 255
+        type: string
+        x-go-name: Password
+    required:
+    - name
+    - email
+    - password
+    - groupId
+    type: object
+    x-go-package: github.com/zzibert/3fs-rest-api/data
+paths:
+  /users:
+    get:
+      description: Returns a list of users from the database
+      operationId: ListUsers
+      responses:
+        "200":
+          $ref: '#/responses/UsersResponse'
+      tags:
+      - users
+    post:
+      description: Create a new User
+      operationId: createUser
+      responses:
+        "200":
+          $ref: '#/responses/userResponse'
+        "501":
+          $ref: '#/responses/errorResponse'
+      tags:
+      - users
+    put:
+      description: update an user
+      operationId: updateUser
+      responses:
+        "201":
+          $ref: '#/responses/noContentResponse'
+        "404":
+          $ref: '#/responses/errorResponse'
+      tags:
+      - users
+  /users/{id}:
+    delete:
+      description: Deletes an user from the database
+      operationId: deleteUser
+      responses:
+        "201":
+          $ref: '#/responses/noContentResponse'
+        "404":
+          $ref: '#/responses/errorResponse'
+        "501":
+          $ref: '#/responses/errorResponse'
+      tags:
+      - users
+    get:
+      description: Returns a single user from the database
+      operationId: ListUser
+      responses:
+        "200":
+          $ref: '#/responses/userResponse'
+        "404":
+          $ref: '#/responses/errorResponse'
+      tags:
+      - users
+swagger: "2.0"

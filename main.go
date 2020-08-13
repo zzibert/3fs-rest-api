@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/zzibert/3fs-rest-api/handlers"
 )
 
 func main() {
@@ -16,10 +17,10 @@ func main() {
 	l := log.New(os.Stdout, "3fs-rest-api", log.LstdFlags)
 
 	// create the user handlers
-	userHandler := handlers.NewUsers()
+	userHandler := handlers.NewUsers(l)
 
 	// create the group handlers
-	groupHandler := handlers.NewGroups()
+	groupHandler := handlers.NewGroups(l)
 
 	// create a new serve mux and register the handlers
 	sm := mux.NewRouter()

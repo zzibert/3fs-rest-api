@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 
-	"github.com/gorilla/mux"
 	"github.com/zzibert/3fs-rest-api/data"
 )
 
@@ -26,21 +24,6 @@ var ErrInvalidUserPath = fmt.Errorf("Invalid path, path should be /users/[id]")
 // GenericError is a generic error message
 type GenericError struct {
 	Message string `json:"message"`
-}
-
-// getUserId returnes the user Id from the URL
-// panics if it cannot convert the id into an integer
-func getUserId(r *http.Request) int {
-	// parse the user id from the url
-	vars := mux.Vars(r)
-
-	// convert the id into an integer
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		panic(err)
-	}
-
-	return id
 }
 
 // swagger:route GET /users users ListUsers
@@ -68,7 +51,7 @@ func (u *Users) ListAll(rw http.ResponseWriter, r *http.Request) {
 
 // ListSingle handles GET requests with id
 func (u *Users) ListSingle(rw http.ResponseWriter, r *http.Request) {
-	id := getUserId(r)
+	id := getId(r)
 
 	u.l.Println("get user id", id)
 
