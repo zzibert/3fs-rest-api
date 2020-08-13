@@ -1,4 +1,22 @@
 definitions:
+  Group:
+    description: Group defines the structure for an API group
+    properties:
+      id:
+        description: the id of the group
+        format: int64
+        minimum: 1
+        type: integer
+        x-go-name: Id
+      name:
+        description: the name for the group
+        maxLength: 255
+        type: string
+        x-go-name: Name
+    required:
+    - name
+    type: object
+    x-go-package: github.com/zzibert/3fs-rest-api/data
   User:
     description: User defines the structure for an API User
     properties:
@@ -36,6 +54,58 @@ definitions:
     type: object
     x-go-package: github.com/zzibert/3fs-rest-api/data
 paths:
+  /groups:
+    get:
+      description: Return a list of groups from the database
+      operationId: ListGroups
+      responses:
+        "200":
+          $ref: '#/responses/groupsResponse'
+      tags:
+      - groups
+    post:
+      description: Create a new group
+      operationId: createGroup
+      responses:
+        "200":
+          $ref: '#/responses/groupResponse'
+        "501":
+          $ref: '#/responses/errorResponse'
+      tags:
+      - groups
+    put:
+      description: Update a group
+      operationId: updateGroup
+      responses:
+        "201":
+          $ref: '#/responses/noContentResponse'
+        "404":
+          $ref: '#/responses/errorResponse'
+      tags:
+      - groups
+  /groups/{id}:
+    delete:
+      description: Delete a group
+      operationId: deleteGroup
+      responses:
+        "201":
+          $ref: '#/responses/noContentResponse'
+        "404":
+          $ref: '#/responses/errorResponse'
+        "501":
+          $ref: '#/responses/errorResponse'
+      tags:
+      - groups
+    get:
+      description: returns a single group from the database
+      operationId: ListGroup
+      responses:
+        "200":
+          $ref: '#/responses/groupResponse'
+        "404":
+          $ref: '#/responses/errorResponse'
+      tags:
+      - groups
   /users:
     get:
       description: Returns a list of users from the database

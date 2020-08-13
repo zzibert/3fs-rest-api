@@ -6,6 +6,7 @@ import "fmt"
 var ErrGroupNotFound = fmt.Errorf("Group not found")
 
 // Group defines the structure for an API group
+// swagger:model
 type Group struct {
 	// the id of the group
 	//

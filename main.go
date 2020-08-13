@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -9,10 +10,24 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/subosito/gotenv"
 	"github.com/zzibert/3fs-rest-api/handlers"
 )
 
 func main() {
+
+	// Loading environment variables
+	gotenv.Load()
+
+	// Getting all environment variables
+	host := os.Getenv("HOST")
+	port := os.Getenv("PORT")
+	user := os.Getenv("USER")
+	password := os.Getenv("PASSWORD")
+	dbname := os.GetEnv("DBNAME")
+
+	// connection string for database
+	connection := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 
 	l := log.New(os.Stdout, "3fs-rest-api", log.LstdFlags)
 
