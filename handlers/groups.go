@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 
@@ -9,7 +10,8 @@ import (
 
 // Groups Handler for getting and updating groups
 type Groups struct {
-	l *log.Logger
+	l  *log.Logger
+	Db *sql.DB
 }
 
 // NewGroups returns a new groups handler

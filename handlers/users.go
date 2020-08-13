@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,7 +11,8 @@ import (
 
 // Users handler for getting and updating users
 type Users struct {
-	l *log.Logger
+	l  *log.Logger
+	Db *sql.DB
 }
 
 // NewUsers returns a new users handler with the given logger

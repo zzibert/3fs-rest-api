@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	_ "github.com/lib/pq"
 	"github.com/subosito/gotenv"
 	"github.com/zzibert/3fs-rest-api/handlers"
 )
@@ -29,13 +31,20 @@ func main() {
 	// connection string for database
 	connection := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 
+	// Opening a connection to the postgres database
+	db, err := sql.Open("postgres", connection)
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
 	l := log.New(os.Stdout, "3fs-rest-api", log.LstdFlags)
 
 	// create the user handlers
-	userHandler := handlers.NewUsers(l)
+	userHandler := handlers.NewUsers(l, db)
 
 	// create the group handlers
-	groupHandler := handlers.NewGroups(l)
+	groupHandler := handlers.NewGroups(l, db)
 
 	// create a new serve mux and register the handlers
 	sm := mux.NewRouter()
