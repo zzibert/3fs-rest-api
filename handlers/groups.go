@@ -72,3 +72,34 @@ func (g *Groups) ListSingle(rw http.ResponseWriter, r *http.Request) {
 	}
 
 }
+
+// swagger:route PUT /groups groups updateGroup
+// Update a group
+//
+// responses:
+// 201: noContentResponse
+// 404: errorResponse
+
+// Update handles PUT requests to update group
+func (g *Groups) Update(rw http.ResponseWriter, r *http.Request) {
+
+	// create the group from the request body
+	var group data.Group
+	err := data.FromJSON(group, r.Body)
+	if err != nil {
+		u.l.Println("Error couldnt parse group from request body", err)
+
+		rw.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	err = data.UpdateGroup(group)
+	if err != nil {
+		u.l.Println("Error group not found", group)
+
+		rw.WriteHeader(http.StatusNotFound)
+		data.ToJSON(&GenericError{Message: "Group not found in database"}, rw)
+		return
+	}
+
+	rw.WriteHeader(http.StatusNoContent)
+}
