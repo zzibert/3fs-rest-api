@@ -38,3 +38,11 @@ type User struct {
 	// min: 1
 	GroupId int `json:"groupId"`
 }
+
+// Users defines a slice of Users
+type Users []*User
+
+// GetUsers returns all products from the database
+func GetUsers() Users {
+
+}
