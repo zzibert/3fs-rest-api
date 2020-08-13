@@ -108,3 +108,24 @@ func (u *Users) Update(rw http.ResponseWriter, r *http.Request) {
 
 	rw.WriteHeader(http.StatusNoContent)
 }
+
+// swagger:route POST /users users createUser
+// Create a new User
+//
+// responses:
+//  200: userResponse
+//  501: errorResponse
+
+// Create handles POST requests to add new users
+func (u *Users) Create(rw http.ResponseWriter, r *http.Request) {
+	var user data.User
+	err := data.FromJSON(user, r.Body)
+	if err != nil {
+		u.l.Println("Error couldnt parse user from request body", err)
+
+		rw.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	data.AddUser(user)
+}
