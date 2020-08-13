@@ -123,7 +123,7 @@ func (u *Users) Create(rw http.ResponseWriter, r *http.Request) {
 
 // DeleteUser handles DELETE requests for deleting an user from the database
 func (u *Users) Delete(rw http.ResponseWriter, r *http.Request) {
-	id := getUserId(r)
+	id := getId(r)
 
 	u.l.Println("Deleting user with id", id)
 
