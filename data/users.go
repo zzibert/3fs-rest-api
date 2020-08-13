@@ -46,3 +46,25 @@ type Users []*User
 func GetUsers() Users {
 
 }
+
+// GetUserById returns a single user with the specified id
+// If the user is not found this func retuns UserNotFound error
+func GetUserById(id int) (*User, error) {
+
+}
+
+// UpdateUser replaces a user with the given item
+// If the user is not found this func returns UserNotFound error
+func UpdateUser(u User) error {
+
+}
+
+// AddUser adds a new user to the database
+func AddUser(u User) {
+
+}
+
+// DeleteUser deletes an user from the database
+func DeleteUser(id int) error {
+
+}
