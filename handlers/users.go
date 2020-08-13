@@ -102,7 +102,7 @@ func (u *Users) Update(rw http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		u.l.Println("Error user not found", user)
 
-		rw.WriteHeader(http.StatusNotFount)
+		rw.WriteHeader(http.StatusNotFound)
 		return
 	}
 
@@ -128,4 +128,37 @@ func (u *Users) Create(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	data.AddUser(user)
+}
+
+// swagger:route DELETE /users/{id} users deleteUser
+// Deletes an user from the database
+//
+// responses:
+//  201: noContentResponse
+//  404: errorResponse
+//  501: errorResponse
+
+// DeleteUser handles DELETE requests for deleting an user from the database
+func (u *Users) Delete(rw http.ResponseWriter, r *http.Request) {
+	id := getUserId(r)
+
+	u.l.Println("Deleting user with id", id)
+
+	err := data.DeleteUser(id)
+	switch err {
+	case nil:
+
+	case data.ErrUserNotFound:
+		u.l.Println("Error user id does not exist")
+
+		rw.WriteHeader(http.StatusNotFound)
+		return
+	default:
+		u.l.Println("Error deleting user", err)
+
+		rw.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	rw.WriteHeader(http.StatusNoContent)
 }
