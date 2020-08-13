@@ -103,3 +103,24 @@ func (g *Groups) Update(rw http.ResponseWriter, r *http.Request) {
 
 	rw.WriteHeader(http.StatusNoContent)
 }
+
+// swagger:route POST /groups groups createGroup
+// Create a new group
+//
+// responses:
+//  200: groupResponse
+//  501: errorResponse
+
+// Create handles POST requests to add a new group
+func (g *Groups) Create(rw http.ResponseWriter, r *http.Request) {
+	var group data.Group
+	err := data.FromJSON(group, r.Body)
+	if err != nil {
+		u.l.Println("Error couldnt parse group from request body", err)
+
+		rw.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	data.AddGroup(group)
+}
