@@ -124,3 +124,35 @@ func (g *Groups) Create(rw http.ResponseWriter, r *http.Request) {
 
 	data.AddGroup(group)
 }
+
+// swagger:route DELETE /groups/{id} groups deleteGroup
+// Delete a group
+//
+// responses:
+//  201: noContentResponse
+//  404: errorResponse
+// 501: errorResponse
+
+// Delete handles DELETE requests and deletes group from the database
+func (g *Groups) Delete(rw http.ResponseWriter, r *http.Request) {
+	id := getId(r)
+
+	g.l.Println("Error deleting group with id ", id)
+
+	err := data.DeleteGroup(id)
+	if err == data.ErrGroupNotFound {
+		g.l.Println("Error deleting group id does not exist")
+
+		rw.WriteHeader(http.StatusNotFound)
+		data.ToJSON(&GenericError{Message: err.Error()}, rw)
+		return
+	}
+
+	if err != nil {
+		g.l.Println("Error deleting group", err)
+
+		rw.WriteHeader(http.StatusInternalServerError)
+		data.ToJSON(&GenericError{Message: err.Error()}, rw)
+		return
+	}
+}
