@@ -65,20 +65,25 @@ func GetUserById(id int, db *gorm.DB) (user *User, err error) {
 
 // UpdateUser replaces a user with the given item
 // If the user is not found this func returns UserNotFound error
-func UpdateUser(user User, db *gorm.DB) (err error) {
-	if err = db.Save(&user).Error; err != nil {
+func UpdateUser(user *User, db *gorm.DB) (err error) {
+	if err = db.Save(*user).Error; err != nil {
 		err = ErrUserNotFound
 	}
 	return
 }
 
 // AddUser adds a new user to the database
-func AddUser(user User, db *gorm.DB) {
-	db.Create(&user)
+func AddUser(user *User, db *gorm.DB) {
+	db.Create(user)
 }
 
 // DeleteUser deletes an user from the database
-func DeleteUser(id int, db *gorm.DB) {
-	user := User{Id: id}
-	db.Delete(&user)
+func DeleteUser(id int, db *gorm.DB) (err error) {
+	var user *User
+	if err = db.First(user, id).Error; err != nil {
+		err = ErrUserNotFound
+	} else {
+		db.Delete(user)
+	}
+	return
 }
