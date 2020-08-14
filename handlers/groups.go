@@ -50,7 +50,7 @@ func (g *Groups) ListAll(rw http.ResponseWriter, r *http.Request) {
 func (g *Groups) ListSingle(rw http.ResponseWriter, r *http.Request) {
 	id := getId(r)
 
-	group, err := data.GetGroupById(g.Db, id)
+	group, err := data.GetGroupById(id, g.Db)
 
 	switch err {
 	case nil:
@@ -95,7 +95,7 @@ func (g *Groups) Update(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	err = data.UpdateGroup(g.Db, group)
+	err = data.UpdateGroup(&group, g.Db)
 	if err != nil {
 		g.l.Println("Error group not found", group)
 
@@ -125,7 +125,7 @@ func (g *Groups) Create(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data.AddGroup(g.Db, group)
+	data.AddGroup(&group, g.Db)
 }
 
 // swagger:route DELETE /groups/{id} groups deleteGroup
@@ -142,7 +142,7 @@ func (g *Groups) Delete(rw http.ResponseWriter, r *http.Request) {
 
 	g.l.Println("Error deleting group with id ", id)
 
-	err := data.DeleteGroup(id)
+	err := data.DeleteGroup(id, g.Db)
 	if err == data.ErrGroupNotFound {
 		g.l.Println("Error deleting group id does not exist")
 

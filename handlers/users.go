@@ -57,7 +57,7 @@ func (u *Users) ListSingle(rw http.ResponseWriter, r *http.Request) {
 
 	u.l.Println("get user id", id)
 
-	user, err := data.GetUserById(id)
+	user, err := data.GetUserById(id, u.Db)
 
 	switch err {
 
@@ -83,7 +83,7 @@ func (u *Users) Update(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	err = data.UpdateUser(user)
+	err = data.UpdateUser(&user, u.Db)
 	if err != nil {
 		u.l.Println("Error user not found", user)
 
@@ -113,7 +113,7 @@ func (u *Users) Create(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data.AddUser(user)
+	data.AddUser(&user, u.Db)
 }
 
 // swagger:route DELETE /users/{id} users deleteUser
@@ -130,7 +130,7 @@ func (u *Users) Delete(rw http.ResponseWriter, r *http.Request) {
 
 	u.l.Println("Deleting user with id", id)
 
-	err := data.DeleteUser(id)
+	err := data.DeleteUser(id, u.Db)
 	switch err {
 	case nil:
 

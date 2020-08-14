@@ -2,7 +2,6 @@ package data
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/jinzhu/gorm"
 )
@@ -49,7 +48,7 @@ type User struct {
 type Users []*User
 
 // GetUsers returns all users from the database
-func GetUsers(l *log.Logger, db *gorm.DB) (users []*User) {
+func GetUsers(db *gorm.DB) (users []*User) {
 	db.Find(&users)
 	return
 }

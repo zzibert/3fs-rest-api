@@ -2,7 +2,6 @@ package data
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/jinzhu/gorm"
 )
@@ -31,7 +30,7 @@ type Group struct {
 type Groups []*Group
 
 // GetGroups returns all groups from the database
-func GetGroups(l *log.Logger, db *gorm.DB) (groups []*Group) {
+func GetGroups(db *gorm.DB) (groups []*Group) {
 	db.Find(groups)
 	return
 }
@@ -47,7 +46,7 @@ func GetGroupById(id int, db *gorm.DB) (group *Group, err error) {
 
 // UpdateGroup replaces a group with the given item
 // If a group is not found this func returns a GroupNotFound error
-func UpdateGroup(group *User, db *gorm.DB) (err error) {
+func UpdateGroup(group *Group, db *gorm.DB) (err error) {
 	if err = db.Save(group).Error; err != nil {
 		err = ErrGroupNotFound
 	}
