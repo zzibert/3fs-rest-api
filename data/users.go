@@ -56,8 +56,10 @@ func GetUsers(l *log.Logger, db *gorm.DB) (users []*User) {
 
 // GetUserById returns a single user with the specified id
 // If the user is not found this func retuns UserNotFound error
-func GetUserById(id int, db *gorm.DB) (user *User) {
-	db.First(user)
+func GetUserById(id int, db *gorm.DB) (user *User, err error) {
+	if err = db.First(user, id).Error; err != nil {
+		err = ErrUserNotFound
+	}
 	return
 }
 

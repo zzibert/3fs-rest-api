@@ -49,8 +49,7 @@ func GetGroupById(db *gorm.DB, id int) (group *Group, err error) {
 // UpdateGroup replaces a group with the given item
 // If a group is not found this func returns a GroupNotFound error
 func UpdateGroup(db *gorm.DB, group Group) (err error) {
-	err = db.Save(&group)
-	if err == nil {
+	if err = db.Save(&group).Error; err != nil {
 		err = ErrGroupNotFound
 	}
 	return
