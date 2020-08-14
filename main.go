@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,8 +10,10 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
 	"github.com/subosito/gotenv"
+	"github.com/zzibert/3fs-rest-api/data"
 	"github.com/zzibert/3fs-rest-api/handlers"
 )
 
@@ -32,13 +33,16 @@ func main() {
 	connection := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 
 	// Opening a connection to the postgres database
-	db, err := sql.Open("postgres", connection)
+	db, err := gorm.Open("postgres", connection)
 	if err != nil {
 		panic(err)
 	}
 	defer db.Close()
 
 	l := log.New(os.Stdout, "3fs-rest-api", log.LstdFlags)
+
+	// Init user and group tables
+	db.AutoMigrate(&data.User{}, &data.Group)
 
 	// create the user handlers
 	userHandler := handlers.NewUsers(l, db)

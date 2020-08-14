@@ -1,6 +1,10 @@
 package data
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/jinzhu/gorm"
+)
 
 // ErrGroupNotFound is an error raised when a group can not be found in the database
 var ErrGroupNotFound = fmt.Errorf("Group not found")
@@ -25,14 +29,20 @@ type Group struct {
 type Groups []*Group
 
 // GetGroups returns all groups from the database
-func GetGroups() Groups {
-
+func GetGroups(db *gorm.DB) Groups {
+	var groups Groups
+	db.Find(&groups)
+	return groups
 }
 
 // GetGroupById returns a single group with the specified id
 // If a group is not found this func returns a GroupNotFound error
-func GetGroupById(id int) (*Group, error) {
-
+func GetGroupById(db *gorm.DB, id int) (group *Group, err error) {
+	db.Where("id = ?", id).First(&group)
+	if group == nil {
+		err = ErrGroupNotFound
+	}
+	return
 }
 
 // UpdateGroup replaces a group with the given item

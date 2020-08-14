@@ -1,17 +1,17 @@
 package handlers
 
 import (
-	"database/sql"
 	"log"
 	"net/http"
 
+	"github.com/jinzhu/gorm"
 	"github.com/zzibert/3fs-rest-api/data"
 )
 
 // Groups Handler for getting and updating groups
 type Groups struct {
 	l  *log.Logger
-	Db *sql.DB
+	Db *gorm.DB
 }
 
 // NewGroups returns a new groups handler

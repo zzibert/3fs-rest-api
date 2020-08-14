@@ -1,6 +1,10 @@
 package data
 
-import "fmt"
+import (
+	"database/sql"
+	"fmt"
+	"log"
+)
 
 // ErrUserNotFound is an error raised when a product can not be found in the database
 var ErrUserNotFound = fmt.Errorf("Product not found")
@@ -42,9 +46,18 @@ type User struct {
 // Users defines a slice of Users
 type Users []*User
 
-// GetUsers returns all products from the database
-func GetUsers() Users {
+// GetUsers returns all users from the database
+func GetUsers(l *log.Logger, db *sql.DB) Users {
+	rows, err := db.Query("select id, name, password, email, group_id from users")
+	if err != nil {
+		return
+	}
 
+	var users Users
+	for rows.Next() {
+		var user *User
+		err = rows.Scan(&user.Id, &user.Name, &user.password, &user.email, &user.group_id)
+	}
 }
 
 // GetUserById returns a single user with the specified id

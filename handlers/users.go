@@ -1,18 +1,18 @@
 package handlers
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
 
+	"github.com/jinzhu/gorm"
 	"github.com/zzibert/3fs-rest-api/data"
 )
 
 // Users handler for getting and updating users
 type Users struct {
 	l  *log.Logger
-	Db *sql.DB
+	Db *gorm.DB
 }
 
 // NewUsers returns a new users handler with the given logger
