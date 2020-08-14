@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -15,12 +16,12 @@ type Groups struct {
 }
 
 // NewGroups returns a new groups handler
-func NewGroups(l *log.Logger) *Groups {
-	return &Groups{l}
+func NewGroups(l *log.Logger, db *gorm.DB) *Groups {
+	return &Groups{l, db}
 }
 
 // ErrInvalidGroupPath is an error message when the group path is not valid
-var ErrInvalidGroupPath = fmt.Errof("Invalid Path, path should be /groups/[id]")
+var ErrInvalidGroupPath = fmt.Errorf("Invalid Path, path should be /groups/[id]")
 
 // swagger:route GET /groups groups ListGroups
 // Return a list of groups from the database
@@ -31,7 +32,7 @@ var ErrInvalidGroupPath = fmt.Errof("Invalid Path, path should be /groups/[id]")
 func (g *Groups) ListAll(rw http.ResponseWriter, r *http.Request) {
 	g.l.Println("get all groups")
 
-	groups := data.GetGroups()
+	groups := data.GetGroups(g.Db)
 
 	err := data.ToJSON(groups, rw)
 	if err != nil {
@@ -49,7 +50,7 @@ func (g *Groups) ListAll(rw http.ResponseWriter, r *http.Request) {
 func (g *Groups) ListSingle(rw http.ResponseWriter, r *http.Request) {
 	id := getId(r)
 
-	group, err := data.GetGroupById(id)
+	group, err := data.GetGroupById(g.Db, id)
 
 	switch err {
 	case nil:
@@ -89,14 +90,14 @@ func (g *Groups) Update(rw http.ResponseWriter, r *http.Request) {
 	var group data.Group
 	err := data.FromJSON(group, r.Body)
 	if err != nil {
-		u.l.Println("Error couldnt parse group from request body", err)
+		g.l.Println("Error couldnt parse group from request body", err)
 
 		rw.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	err = data.UpdateGroup(group)
+	err = data.UpdateGroup(g.Db, group)
 	if err != nil {
-		u.l.Println("Error group not found", group)
+		g.l.Println("Error group not found", group)
 
 		rw.WriteHeader(http.StatusNotFound)
 		data.ToJSON(&GenericError{Message: "Group not found in database"}, rw)
@@ -118,13 +119,13 @@ func (g *Groups) Create(rw http.ResponseWriter, r *http.Request) {
 	var group data.Group
 	err := data.FromJSON(group, r.Body)
 	if err != nil {
-		u.l.Println("Error couldnt parse group from request body", err)
+		g.l.Println("Error couldnt parse group from request body", err)
 
 		rw.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	data.AddGroup(group)
+	data.AddGroup(g.Db, group)
 }
 
 // swagger:route DELETE /groups/{id} groups deleteGroup

@@ -16,8 +16,8 @@ type Users struct {
 }
 
 // NewUsers returns a new users handler with the given logger
-func NewUsers(l *log.Logger) *Users {
-	return &Users{l}
+func NewUsers(l *log.Logger, db *gorm.DB) *Users {
+	return &Users{l, db}
 }
 
 // ErrInvalidUserPath is an error when user path is not valid
@@ -37,7 +37,7 @@ type GenericError struct {
 func (u *Users) ListAll(rw http.ResponseWriter, r *http.Request) {
 	u.l.Println("Get all users")
 
-	users := data.GetUsers()
+	users := data.GetUsers(u.Db)
 
 	err := data.ToJSON(users, rw)
 	if err != nil {

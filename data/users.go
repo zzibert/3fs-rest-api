@@ -1,9 +1,10 @@
 package data
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
+
+	"github.com/jinzhu/gorm"
 )
 
 // ErrUserNotFound is an error raised when a product can not be found in the database
@@ -12,6 +13,7 @@ var ErrUserNotFound = fmt.Errorf("Product not found")
 // User defines the structure for an API User
 // swagger:model
 type User struct {
+	gorm.Model
 	// the id of the user
 	//
 	// required: false
@@ -47,37 +49,31 @@ type User struct {
 type Users []*User
 
 // GetUsers returns all users from the database
-func GetUsers(l *log.Logger, db *sql.DB) Users {
-	rows, err := db.Query("select id, name, password, email, group_id from users")
-	if err != nil {
-		return
-	}
-
-	var users Users
-	for rows.Next() {
-		var user *User
-		err = rows.Scan(&user.Id, &user.Name, &user.password, &user.email, &user.group_id)
-	}
+func GetUsers(l *log.Logger, db *gorm.DB) (users []*User) {
+	db.Find(&users)
+	return
 }
 
 // GetUserById returns a single user with the specified id
 // If the user is not found this func retuns UserNotFound error
-func GetUserById(id int) (*User, error) {
-
+func GetUserById(id int, db *gorm.DB) (user *User) {
+	db.First(user)
+	return
 }
 
 // UpdateUser replaces a user with the given item
 // If the user is not found this func returns UserNotFound error
-func UpdateUser(u User) error {
-
+func UpdateUser(user User, db *gorm.DB) {
+	db.Save(&user)
 }
 
 // AddUser adds a new user to the database
-func AddUser(u User) {
-
+func AddUser(user User, db *gorm.DB) {
+	db.Create(&user)
 }
 
 // DeleteUser deletes an user from the database
-func DeleteUser(id int) error {
-
+func DeleteUser(id int, db *gorm.DB) {
+	user := User{Id: id}
+	db.Delete(&user)
 }

@@ -12,6 +12,7 @@ var ErrGroupNotFound = fmt.Errorf("Group not found")
 // Group defines the structure for an API group
 // swagger:model
 type Group struct {
+	gorm.Model
 	// the id of the group
 	//
 	// required: false
@@ -47,8 +48,12 @@ func GetGroupById(db *gorm.DB, id int) (group *Group, err error) {
 
 // UpdateGroup replaces a group with the given item
 // If a group is not found this func returns a GroupNotFound error
-func UpdateGroup(db *gorm.DB, group Group) {
-	db.Save(&group)
+func UpdateGroup(db *gorm.DB, group Group) (err error) {
+	err = db.Save(&group)
+	if err == nil {
+		err = ErrGroupNotFound
+	}
+	return
 }
 
 // AddGroup adds a group to the database
