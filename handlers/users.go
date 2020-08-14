@@ -39,7 +39,7 @@ func (u *Users) ListAll(rw http.ResponseWriter, r *http.Request) {
 
 	users := data.GetUsers(u.Db)
 
-	err := data.ToJSON(&users, rw)
+	err := data.ToJSON(users, rw)
 	if err != nil {
 		u.l.Println("error encoding users")
 	}
@@ -55,6 +55,8 @@ func (u *Users) ListAll(rw http.ResponseWriter, r *http.Request) {
 func (u *Users) ListSingle(rw http.ResponseWriter, r *http.Request) {
 	id := getId(r)
 
+	u.l.Println("Get User id: ", id)
+
 	user, err := data.GetUserById(id, u.Db)
 
 	switch err {
@@ -65,7 +67,7 @@ func (u *Users) ListSingle(rw http.ResponseWriter, r *http.Request) {
 
 		rw.WriteHeader(http.StatusNotFound)
 		data.ToJSON(&GenericError{Message: err.Error()}, rw)
-
+		return
 	default:
 		u.l.Println("Error fetching user", err)
 
@@ -74,11 +76,10 @@ func (u *Users) ListSingle(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = data.ToJSON(&user, rw)
+	err = data.ToJSON(user, rw)
 	if err != nil {
 		u.l.Println("Error encoding group", err)
 	}
-
 }
 
 // swagger:route PUT /users users updateUser

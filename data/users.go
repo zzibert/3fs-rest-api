@@ -7,7 +7,7 @@ import (
 )
 
 // ErrUserNotFound is an error raised when a user can not be found in the database
-var ErrUserNotFound = fmt.Errorf("Product not found")
+var ErrUserNotFound = fmt.Errorf("User not found")
 
 // User defines the structure for an API User
 // swagger:model
@@ -56,8 +56,8 @@ func GetUsers(db *gorm.DB) (users []*User) {
 
 // GetUserById returns a single user with the specified id
 // If the user is not found this func retuns UserNotFound error
-func GetUserById(id int, db *gorm.DB) (user *User, err error) {
-	if err = db.Where("id = ?", id).First(user).Error; err != nil {
+func GetUserById(id int, db *gorm.DB) (user User, err error) {
+	if err = db.First(&user, id).Error; err != nil {
 		err = ErrUserNotFound
 	}
 	return
