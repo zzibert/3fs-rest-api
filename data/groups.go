@@ -12,7 +12,6 @@ var ErrGroupNotFound = fmt.Errorf("Group not found")
 // Group defines the structure for an API group
 // swagger:model
 type Group struct {
-	gorm.Model
 	// the id of the group
 	//
 	// required: false

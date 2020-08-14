@@ -34,7 +34,7 @@ func (g *Groups) ListAll(rw http.ResponseWriter, r *http.Request) {
 
 	groups := data.GetGroups(g.Db)
 
-	err := data.ToJSON(groups, rw)
+	err := data.ToJSON(&groups, rw)
 	if err != nil {
 		g.l.Println("error encoding groups")
 	}
@@ -69,7 +69,7 @@ func (g *Groups) ListSingle(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = data.ToJSON(group, rw)
+	err = data.ToJSON(&group, rw)
 	if err != nil {
 		g.l.Println("Error encoding group", err)
 	}
@@ -88,7 +88,7 @@ func (g *Groups) Update(rw http.ResponseWriter, r *http.Request) {
 
 	// create the group from the request body
 	var group data.Group
-	err := data.FromJSON(group, r.Body)
+	err := data.FromJSON(&group, r.Body)
 	if err != nil {
 		g.l.Println("Error couldnt parse group from request body", err)
 
@@ -117,7 +117,7 @@ func (g *Groups) Update(rw http.ResponseWriter, r *http.Request) {
 // Create handles POST requests to add a new group
 func (g *Groups) Create(rw http.ResponseWriter, r *http.Request) {
 	var group data.Group
-	err := data.FromJSON(group, r.Body)
+	err := data.FromJSON(&group, r.Body)
 	if err != nil {
 		g.l.Println("Error couldnt parse group from request body", err)
 

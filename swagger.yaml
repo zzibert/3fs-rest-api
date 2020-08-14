@@ -1,4 +1,15 @@
+basePath: /
+consumes:
+- application/json
 definitions:
+  GenericError:
+    description: GenericError is a generic error message
+    properties:
+      message:
+        type: string
+        x-go-name: Message
+    type: object
+    x-go-package: github.com/zzibert/3fs-rest-api/handlers
   Group:
     description: Group defines the structure for an API group
     properties:
@@ -98,6 +109,10 @@ definitions:
     - groupId
     type: object
     x-go-package: github.com/zzibert/3fs-rest-api/data
+info:
+  description: Documentation for 3fs API
+  title: 3fs API
+  version: 1.0.0
 paths:
   /groups:
     get:
@@ -203,4 +218,13 @@ paths:
           $ref: '#/responses/errorResponse'
       tags:
       - users
+produces:
+- application/json
+responses:
+  errorResponse:
+    description: Generic error message returned as a string
+    schema:
+      $ref: '#/definitions/GenericError'
+schemes:
+- http
 swagger: "2.0"

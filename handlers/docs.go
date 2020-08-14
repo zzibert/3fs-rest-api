@@ -1,4 +1,4 @@
-// Package classification of 3fs API
+// Package classification 3fs API
 //
 // Documentation for 3fs API
 //
@@ -14,3 +14,11 @@
 //
 // swagger:meta
 package handlers
+
+// Generic error message returned as a string
+// swagger:response errorResponse
+type errorResponseWrapper struct {
+	// Description of the error
+	// in: body
+	Body GenericError
+}

@@ -39,7 +39,7 @@ func (u *Users) ListAll(rw http.ResponseWriter, r *http.Request) {
 
 	users := data.GetUsers(u.Db)
 
-	err := data.ToJSON(users, rw)
+	err := data.ToJSON(&users, rw)
 	if err != nil {
 		u.l.Println("error encoding users")
 	}
@@ -74,7 +74,7 @@ func (u *Users) ListSingle(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = data.ToJSON(user, rw)
+	err = data.ToJSON(&user, rw)
 	if err != nil {
 		u.l.Println("Error encoding group", err)
 	}
@@ -93,7 +93,7 @@ func (u *Users) Update(rw http.ResponseWriter, r *http.Request) {
 
 	// create the user from the request body
 	var user data.User
-	err := data.FromJSON(user, r.Body)
+	err := data.FromJSON(&user, r.Body)
 	if err != nil {
 		u.l.Println("Error couldnt parse user from request body", err)
 
@@ -122,7 +122,7 @@ func (u *Users) Update(rw http.ResponseWriter, r *http.Request) {
 // Create handles POST requests to add new users
 func (u *Users) Create(rw http.ResponseWriter, r *http.Request) {
 	var user data.User
-	err := data.FromJSON(user, r.Body)
+	err := data.FromJSON(&user, r.Body)
 	if err != nil {
 		u.l.Println("Error couldnt parse user from request body", err)
 
