@@ -42,7 +42,8 @@ func main() {
 	l := log.New(os.Stdout, "3fs-rest-api", log.LstdFlags)
 
 	// Init user and group tables
-	db.AutoMigrate(&data.User{}, &data.Group{})
+	db.AutoMigrate(&data.User{})
+	db.AutoMigrate(&data.Group{})
 
 	// create the user handlers
 	userHandler := handlers.NewUsers(l, db)

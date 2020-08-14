@@ -12,25 +12,28 @@ var ErrGroupNotFound = fmt.Errorf("Group not found")
 // Group defines the structure for an API group
 // swagger:model
 type Group struct {
+	gorm.Model
 	// the id of the group
 	//
 	// required: false
 	// min: 1
-	Id int `json:"id"`
+	// Id int `json:"id"`
 
 	// the name for the group
 	//
 	// required: true
 	// max length: 255
-	Name string `json:"name"`
-}
+	Name string `json:"name" gorm:"unique"`
 
-// Groups defines a slice of Group
-type Groups []*Group
+	Users []User `json:"users" gorm:foreignkey:GroupID`
+	// the list of users belonging to this group
+	//
+	// required: false
+}
 
 // GetGroups returns all groups from the database
 func GetGroups(db *gorm.DB) (groups []*Group) {
-	db.Find(groups)
+	db.Find(&groups)
 	return
 }
 

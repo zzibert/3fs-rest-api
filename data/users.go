@@ -17,7 +17,7 @@ type User struct {
 	//
 	// required: false
 	// min:1
-	Id int `json:id`
+	// Id int `json:id`
 
 	// the name of the user
 	//
@@ -29,23 +29,20 @@ type User struct {
 	//
 	// required: true
 	// max length: 255
-	Email string `json:"email"`
+	Email string `json:"email" gorm:"type:varchar(100);unique_index"`
 
 	// the password of the user
 	//
 	// required: true
 	// max length: 255
-	Password string `json:"password"`
+	Password string `json:"password" gorm:"unique"`
 
 	// the id of the group that the user belongs to
 	//
 	// required: true
 	// min: 1
-	GroupId int `json:"groupId"`
+	GroupID uint `json:"groupId" `
 }
-
-// Users defines a slice of Users
-type Users []*User
 
 // GetUsers returns all users from the database
 func GetUsers(db *gorm.DB) (users []*User) {
