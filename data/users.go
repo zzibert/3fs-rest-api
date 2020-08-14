@@ -6,24 +6,23 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// ErrUserNotFound is an error raised when a product can not be found in the database
+// ErrUserNotFound is an error raised when a user can not be found in the database
 var ErrUserNotFound = fmt.Errorf("Product not found")
 
 // User defines the structure for an API User
 // swagger:model
 type User struct {
-
 	// the id of the user
 	//
 	// required: false
 	// min:1
-	ID uint `json:id gorm:"primary_key"`
+	ID int `json:"id" gorm:"primary_key"`
 
 	// the name of the user
 	//
 	// required: true
 	// max length: 255
-	Name string `json:"name"`
+	Name string `json:"name" gorm:"type:varchar(20);unique"`
 
 	// the email of the user
 	//
@@ -41,8 +40,12 @@ type User struct {
 	//
 	// required: true
 	// min: 1
-	GroupID uint `json:"groupId" `
-	Group   Group
+	GroupID int `json:"groupId" `
+
+	// The group that the user belongs to
+	//
+	// required: false
+	Group Group `json:"-" gorm:"foreignkey:GroupID"`
 }
 
 // GetUsers returns all users from the database
