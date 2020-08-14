@@ -2,6 +2,18 @@ definitions:
   Group:
     description: Group defines the structure for an API group
     properties:
+      CreatedAt:
+        format: date-time
+        type: string
+      DeletedAt:
+        format: date-time
+        type: string
+      ID:
+        format: uint64
+        type: integer
+      UpdatedAt:
+        format: date-time
+        type: string
       id:
         description: the id of the group
         format: int64
@@ -17,14 +29,47 @@ definitions:
     - name
     type: object
     x-go-package: github.com/zzibert/3fs-rest-api/data
+  Model:
+    description: |-
+      Model base model definition, including fields `ID`, `CreatedAt`, `UpdatedAt`, `DeletedAt`, which could be embedded in your models
+      type User struct {
+      gorm.Model
+      }
+    properties:
+      CreatedAt:
+        format: date-time
+        type: string
+      DeletedAt:
+        format: date-time
+        type: string
+      ID:
+        format: uint64
+        type: integer
+      UpdatedAt:
+        format: date-time
+        type: string
+    type: object
+    x-go-package: github.com/jinzhu/gorm
   User:
     description: User defines the structure for an API User
     properties:
+      CreatedAt:
+        format: date-time
+        type: string
+      DeletedAt:
+        format: date-time
+        type: string
+      ID:
+        format: uint64
+        type: integer
       Id:
         description: the id of the user
         format: int64
         minimum: 1
         type: integer
+      UpdatedAt:
+        format: date-time
+        type: string
       email:
         description: the email of the user
         maxLength: 255
