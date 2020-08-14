@@ -27,10 +27,10 @@ func main() {
 	port := os.Getenv("PORT")
 	user := os.Getenv("USER")
 	password := os.Getenv("PASSWORD")
-	dbname := os.GetEnv("DBNAME")
+	dbname := os.Getenv("DBNAME")
 
 	// connection string for database
-	connection := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+	connection := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 
 	// Opening a connection to the postgres database
 	db, err := gorm.Open("postgres", connection)

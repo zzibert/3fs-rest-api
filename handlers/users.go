@@ -55,13 +55,30 @@ func (u *Users) ListAll(rw http.ResponseWriter, r *http.Request) {
 func (u *Users) ListSingle(rw http.ResponseWriter, r *http.Request) {
 	id := getId(r)
 
-	u.l.Println("get user id", id)
-
 	user, err := data.GetUserById(id, u.Db)
 
 	switch err {
+	case nil:
 
+	case data.ErrUserNotFound:
+		u.l.Println("Error fetching user", err)
+
+		rw.WriteHeader(http.StatusNotFound)
+		data.ToJSON(&GenericError{Message: err.Error()}, rw)
+
+	default:
+		u.l.Println("Error fetching user", err)
+
+		rw.WriteHeader(http.StatusInternalServerError)
+		data.ToJSON(&GenericError{Message: err.Error()}, rw)
+		return
 	}
+
+	err = data.ToJSON(user, rw)
+	if err != nil {
+		u.l.Println("Error encoding group", err)
+	}
+
 }
 
 // swagger:route PUT /users users updateUser
