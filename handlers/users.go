@@ -130,7 +130,12 @@ func (u *Users) Create(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data.AddUser(&user, u.Db)
+	err = data.AddUser(&user, u.Db)
+	if err != nil {
+		u.l.Println("Error adding user: ", err)
+
+		rw.WriteHeader(http.StatusBadRequest)
+	}
 }
 
 // swagger:route DELETE /users/{id} users deleteUser

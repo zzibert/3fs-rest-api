@@ -69,7 +69,7 @@ func (g *Groups) ListSingle(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = data.ToJSON(&group, rw)
+	err = data.ToJSON(group, rw)
 	if err != nil {
 		g.l.Println("Error encoding group", err)
 	}

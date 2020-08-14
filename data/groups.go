@@ -40,7 +40,7 @@ func GetGroups(db *gorm.DB) (groups []*Group) {
 // GetGroupById returns a single group with the specified id
 // If a group is not found this func returns a GroupNotFound error
 func GetGroupById(id int, db *gorm.DB) (group *Group, err error) {
-	if err = db.First(group, id).Error; err != nil {
+	if err = db.Where("id = ?", id).First(group).Error; err != nil {
 		err = ErrGroupNotFound
 	}
 	return
