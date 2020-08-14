@@ -47,16 +47,17 @@ func GetGroupById(db *gorm.DB, id int) (group *Group, err error) {
 
 // UpdateGroup replaces a group with the given item
 // If a group is not found this func returns a GroupNotFound error
-func UpdateGroup(g Group) error {
-
+func UpdateGroup(db *gorm.DB, group Group) {
+	db.Save(&group)
 }
 
 // AddGroup adds a group to the database
-func AddGroup(g Group) {
-
+func AddGroup(db *gorm.DB, group Group) {
+	db.Create(&group)
 }
 
 // DeleteGroup deletes a group from the database
-func DeleteGroup(id int) error {
-
+func DeleteGroup(db *gorm.DB, id int) {
+	group := Group{Id: id}
+	db.Delete(&group)
 }
