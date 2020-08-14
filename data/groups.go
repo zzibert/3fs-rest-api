@@ -2,6 +2,7 @@ package data
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/jinzhu/gorm"
 )
@@ -30,17 +31,15 @@ type Group struct {
 type Groups []*Group
 
 // GetGroups returns all groups from the database
-func GetGroups(db *gorm.DB) Groups {
-	var groups Groups
-	db.Find(&groups)
-	return groups
+func GetGroups(l *log.Logger, db *gorm.DB) (groups []*Group) {
+	db.Find(groups)
+	return
 }
 
 // GetGroupById returns a single group with the specified id
 // If a group is not found this func returns a GroupNotFound error
-func GetGroupById(db *gorm.DB, id int) (group *Group, err error) {
-	db.Where("id = ?", id).First(&group)
-	if group == nil {
+func GetGroupById(id int, db *gorm.DB) (group *Group, err error) {
+	if err = db.First(group, id).Error; err != nil {
 		err = ErrGroupNotFound
 	}
 	return
@@ -48,20 +47,25 @@ func GetGroupById(db *gorm.DB, id int) (group *Group, err error) {
 
 // UpdateGroup replaces a group with the given item
 // If a group is not found this func returns a GroupNotFound error
-func UpdateGroup(db *gorm.DB, group Group) (err error) {
-	if err = db.Save(&group).Error; err != nil {
+func UpdateGroup(group *User, db *gorm.DB) (err error) {
+	if err = db.Save(group).Error; err != nil {
 		err = ErrGroupNotFound
 	}
 	return
 }
 
 // AddGroup adds a group to the database
-func AddGroup(db *gorm.DB, group Group) {
-	db.Create(&group)
+func AddGroup(group *Group, db *gorm.DB) {
+	db.Create(group)
 }
 
 // DeleteGroup deletes a group from the database
-func DeleteGroup(db *gorm.DB, id int) {
-	group := Group{Id: id}
-	db.Delete(&group)
+func DeleteGroup(id int, db *gorm.DB) (err error) {
+	var group *Group
+	if err = db.First(group, id).Error; err != nil {
+		err = ErrGroupNotFound
+	} else {
+		db.Delete(group)
+	}
+	return
 }
