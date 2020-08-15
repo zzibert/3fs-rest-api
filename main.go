@@ -63,8 +63,8 @@ func main() {
 
 	// PUT Subrouter
 	putRouter := sm.Methods(http.MethodPut).Subrouter()
-	putRouter.HandleFunc("/users", userHandler.Update)
-	putRouter.HandleFunc("/groups", groupHandler.Update)
+	putRouter.HandleFunc("/users/{id:[0-9]+}", userHandler.Update)
+	putRouter.HandleFunc("/groups/{id:[0-9]+}", groupHandler.Update)
 
 	// POST Subrouter
 	postRouter := sm.Methods(http.MethodPost).Subrouter()

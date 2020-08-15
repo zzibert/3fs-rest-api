@@ -94,14 +94,33 @@ func (u *Users) Update(rw http.ResponseWriter, r *http.Request) {
 
 	// create the user from the request body
 	var user data.User
-	err := data.FromJSON(&user, r.Body)
+	err := data.FromJSON(user, r.Body)
+	u.l.Println("updating user id: ", user.ID)
 	if err != nil {
 		u.l.Println("Error couldnt parse user from request body", err)
 
 		rw.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	err = data.UpdateUser(&user, u.Db)
+
+	originalUser, err := data.GetUserById(user.ID, u.Db)
+	switch err {
+	case nil:
+
+	case data.ErrUserNotFound:
+		u.l.Println("Error updating user", err)
+
+		rw.WriteHeader(http.StatusNotFound)
+		data.ToJSON(&GenericError{Message: err.Error()}, rw)
+		return
+	default:
+		u.l.Println("Error updating user", err)
+
+		rw.WriteHeader(http.StatusInternalServerError)
+		data.ToJSON(&GenericError{Message: err.Error()}, rw)
+		return
+	}
+	err = data.UpdateUser(originalUser, user, u.Db)
 	if err != nil {
 		u.l.Println("Error user not found", user)
 
