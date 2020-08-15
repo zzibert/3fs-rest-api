@@ -12,40 +12,36 @@ var ErrUserNotFound = fmt.Errorf("User not found")
 // User defines the structure for an API User
 // swagger:model
 type User struct {
-	// the id of the user
-	//
-	// required: false
-	// min:1
-	ID int `json:"id" gorm:"primary_key"`
+	gorm.Model
 
 	// the name of the user
 	//
 	// required: true
 	// max length: 255
-	Name string `json:"name" gorm:"type:varchar(20);unique"`
+	Name string `json:"name" gorm:"type:varchar(20);unique;not null"`
 
 	// the email of the user
 	//
 	// required: true
 	// max length: 255
-	Email string `json:"email" gorm:"type:varchar(100);unique"`
+	Email string `json:"email" gorm:"type:varchar(20);unique;not null"`
 
 	// the password of the user
 	//
 	// required: true
 	// max length: 255
-	Password string `json:"password" gorm:"type:varchar(20)"`
+	Password string `json:"password" gorm:"type:varchar(20);not null"`
 
 	// the id of the group that the user belongs to
 	//
 	// required: true
 	// min: 1
-	GroupID int `json:"groupID" `
+	GroupID uint `json:"groupID"`
 
 	// The group that the user belongs to
 	//
 	// required: false
-	Group Group `json:"-" gorm:"foreignkey:GroupID"`
+	Group Group `json:"group"`
 }
 
 // GetUsers returns all users from the database
@@ -56,7 +52,7 @@ func GetUsers(db *gorm.DB) (users []*User) {
 
 // GetUserById returns a single user with the specified id
 // If the user is not found this func retuns UserNotFound error
-func GetUserById(id int, db *gorm.DB) (user User, err error) {
+func GetUserById(id uint, db *gorm.DB) (user User, err error) {
 	user.ID = id
 	if err = db.First(&user).Error; err != nil {
 		err = ErrUserNotFound
@@ -66,7 +62,7 @@ func GetUserById(id int, db *gorm.DB) (user User, err error) {
 
 // UpdateUser replaces a user with the given item
 // If the user is not found this func returns UserNotFound error
-func UpdateUser(id int, userMap map[string]interface{}, db *gorm.DB) (err error) {
+func UpdateUser(id uint, userMap map[string]interface{}, db *gorm.DB) (err error) {
 	var user User
 	if err = db.First(&user, id).Error; err != nil {
 		err = ErrUserNotFound
@@ -83,7 +79,7 @@ func AddUser(user *User, db *gorm.DB) (err error) {
 }
 
 // DeleteUser deletes an user from the database
-func DeleteUser(id int, db *gorm.DB) (err error) {
+func DeleteUser(id uint, db *gorm.DB) (err error) {
 	var user User
 	if err = db.First(&user, id).Error; err != nil {
 		err = ErrUserNotFound

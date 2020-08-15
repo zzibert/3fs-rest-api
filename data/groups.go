@@ -12,22 +12,18 @@ var ErrGroupNotFound = fmt.Errorf("Group not found")
 // Group defines the structure for an API group
 // swagger:model
 type Group struct {
-	// the id of the group
-	//
-	// required: false
-	// min: 1
-	ID int `json:"id" gorm:"primary_key"`
+	gorm.Model
 
 	// the name for the group
 	//
 	// required: true
 	// max length: 255
-	Name string `json:"name" gorm:"type:varchar(20);unique"`
+	Name string `json:"name" gorm:"type:varchar(20);unique;not null"`
 
 	// the list of users belonging to this group
 	//
 	// required: false
-	Users []User `json:"users" gorm:"foreignkey:groupID"`
+	Users []User `json:"users"`
 }
 
 // GetGroups returns all groups from the database
@@ -38,17 +34,19 @@ func GetGroups(db *gorm.DB) (groups []*Group) {
 
 // GetGroupById returns a single group with the specified id
 // If a group is not found this func returns a GroupNotFound error
-func GetGroupById(id int, db *gorm.DB) (group Group, err error) {
+func GetGroupById(id uint, db *gorm.DB) (group Group, err error) {
 	group.ID = id
 	if err = db.First(&group).Error; err != nil {
 		err = ErrGroupNotFound
 	}
+	var users []User
+	db.Model(&group).Related(&users)
 	return
 }
 
 // UpdateGroup replaces a group with the given item
 // If a group is not found this func returns a GroupNotFound error
-func UpdateGroup(id int, groupMap map[string]interface{}, db *gorm.DB) (err error) {
+func UpdateGroup(id uint, groupMap map[string]interface{}, db *gorm.DB) (err error) {
 	var group Group
 	if err = db.First(&group, id).Error; err != nil {
 		err = ErrGroupNotFound
@@ -64,7 +62,7 @@ func AddGroup(group *Group, db *gorm.DB) {
 }
 
 // DeleteGroup deletes a group from the database
-func DeleteGroup(id int, db *gorm.DB) (err error) {
+func DeleteGroup(id uint, db *gorm.DB) (err error) {
 	var group Group
 	if err = db.First(&group, id).Error; err != nil {
 		err = ErrGroupNotFound
