@@ -32,7 +32,7 @@ type Group struct {
 
 // GetGroups returns all groups from the database
 func GetGroups(db *gorm.DB) (groups []*Group) {
-	db.Find(&groups)
+	db.Preload("Users").Find(&groups)
 	return
 }
 
@@ -40,7 +40,7 @@ func GetGroups(db *gorm.DB) (groups []*Group) {
 // If a group is not found this func returns a GroupNotFound error
 func GetGroupById(id int, db *gorm.DB) (group Group, err error) {
 	group.ID = id
-	if err = db.First(&group).Error; err != nil {
+	if err = db.Preload("Users").First(&group).Error; err != nil {
 		err = ErrGroupNotFound
 	}
 	return

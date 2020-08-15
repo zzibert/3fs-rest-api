@@ -45,7 +45,7 @@ type User struct {
 	// The group that the user belongs to
 	//
 	// required: false
-	Group Group `json:"group"`
+	Group Group `json:"-"`
 }
 
 // GetUsers returns all users from the database
