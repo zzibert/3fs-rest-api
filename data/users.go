@@ -40,7 +40,7 @@ type User struct {
 	//
 	// required: true
 	// min: 1
-	GroupID int `json:"groupId" `
+	GroupID int `json:"groupID" `
 
 	// The group that the user belongs to
 	//
@@ -57,7 +57,8 @@ func GetUsers(db *gorm.DB) (users []*User) {
 // GetUserById returns a single user with the specified id
 // If the user is not found this func retuns UserNotFound error
 func GetUserById(id int, db *gorm.DB) (user User, err error) {
-	if err = db.First(&user, id).Error; err != nil {
+	user.ID = id
+	if err = db.First(&user).Error; err != nil {
 		err = ErrUserNotFound
 	}
 	return
