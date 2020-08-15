@@ -91,19 +91,21 @@ func (u *Users) ListSingle(rw http.ResponseWriter, r *http.Request) {
 
 // Update handles PUT to update users
 func (u *Users) Update(rw http.ResponseWriter, r *http.Request) {
+	id := getId(r)
 
-	// create the user from the request body
-	var user data.User
-	err := data.FromJSON(user, r.Body)
-	u.l.Println("updating user id: ", user.ID)
+	u.l.Println("Update User id: ", id)
+
+	userMap := make(map[string]interface{})
+	err := data.FromJSON(&userMap, r.Body)
 	if err != nil {
-		u.l.Println("Error couldnt parse user from request body", err)
+		u.l.Println("Error couldnt parse user map from request body", err)
 
 		rw.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	originalUser, err := data.GetUserById(user.ID, u.Db)
+	err = data.UpdateUser(id, userMap, u.Db)
+
 	switch err {
 	case nil:
 
@@ -118,14 +120,6 @@ func (u *Users) Update(rw http.ResponseWriter, r *http.Request) {
 
 		rw.WriteHeader(http.StatusInternalServerError)
 		data.ToJSON(&GenericError{Message: err.Error()}, rw)
-		return
-	}
-	err = data.UpdateUser(originalUser, user, u.Db)
-	if err != nil {
-		u.l.Println("Error user not found", user)
-
-		rw.WriteHeader(http.StatusNotFound)
-		data.ToJSON(&GenericError{Message: "User not found in database"}, rw)
 		return
 	}
 
