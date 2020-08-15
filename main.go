@@ -13,7 +13,6 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
 	"github.com/subosito/gotenv"
-	"github.com/zzibert/3fs-rest-api/data"
 	"github.com/zzibert/3fs-rest-api/handlers"
 )
 
@@ -40,10 +39,6 @@ func main() {
 	defer db.Close()
 
 	l := log.New(os.Stdout, "3fs-rest-api", log.LstdFlags)
-
-	// Init user and group tables
-	db.AutoMigrate(&data.User{})
-	db.AutoMigrate(&data.Group{})
 
 	// create the user handlers
 	userHandler := handlers.NewUsers(l, db)
