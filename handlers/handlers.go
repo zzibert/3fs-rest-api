@@ -9,7 +9,7 @@ import (
 
 // getId returnes the Id from the URL
 // panics if it cannot convert the id into an integer
-func getId(r *http.Request) uint {
+func getId(r *http.Request) int {
 	// parse the user id from the url
 	vars := mux.Vars(r)
 
@@ -19,5 +19,5 @@ func getId(r *http.Request) uint {
 		panic(err)
 	}
 
-	return uint(id)
+	return id
 }
