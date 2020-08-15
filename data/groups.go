@@ -65,11 +65,11 @@ func AddGroup(group *Group, db *gorm.DB) {
 
 // DeleteGroup deletes a group from the database
 func DeleteGroup(id int, db *gorm.DB) (err error) {
-	var group *Group
-	if err = db.First(group, id).Error; err != nil {
+	var group Group
+	if err = db.First(&group, id).Error; err != nil {
 		err = ErrGroupNotFound
 	} else {
-		db.Delete(group)
+		db.Delete(&group)
 	}
 	return
 }
