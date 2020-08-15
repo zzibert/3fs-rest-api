@@ -83,11 +83,11 @@ func AddUser(user *User, db *gorm.DB) (err error) {
 
 // DeleteUser deletes an user from the database
 func DeleteUser(id int, db *gorm.DB) (err error) {
-	var user *User
-	if err = db.First(user, id).Error; err != nil {
+	var user User
+	if err = db.First(&user, id).Error; err != nil {
 		err = ErrUserNotFound
 	} else {
-		db.Delete(user)
+		db.Delete(&user)
 	}
 	return
 }
