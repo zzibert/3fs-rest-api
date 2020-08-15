@@ -16,36 +16,36 @@ type User struct {
 	//
 	// required: false
 	// min:1
-	ID int `json:"id" gorm:"primary_key"`
+	ID int `json:"id"`
 
 	// the name of the user
 	//
 	// required: true
 	// max length: 255
-	Name string `json:"name" gorm:"type:varchar(20);unique"`
+	Name string `json:"name"`
 
 	// the email of the user
 	//
 	// required: true
 	// max length: 255
-	Email string `json:"email" gorm:"type:varchar(100);unique"`
+	Email string `json:"email"`
 
 	// the password of the user
 	//
 	// required: true
 	// max length: 255
-	Password string `json:"password" gorm:"type:varchar(20)"`
+	Password string `json:"password"`
 
 	// the id of the group that the user belongs to
 	//
 	// required: true
 	// min: 1
-	GroupID int `json:"groupID" `
+	GroupID int `json:"groupID"`
 
 	// The group that the user belongs to
 	//
 	// required: false
-	Group Group `json:"-" gorm:"foreignkey:GroupID"`
+	Group Group `json:"group"`
 }
 
 // GetUsers returns all users from the database

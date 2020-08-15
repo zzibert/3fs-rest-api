@@ -16,18 +16,18 @@ type Group struct {
 	//
 	// required: false
 	// min: 1
-	ID int `json:"id" gorm:"primary_key"`
+	ID int `json:"id"`
 
 	// the name for the group
 	//
 	// required: true
 	// max length: 255
-	Name string `json:"name" gorm:"type:varchar(20);unique"`
+	Name string `json:"name"`
 
 	// the list of users belonging to this group
 	//
 	// required: false
-	Users []User `json:"users" gorm:"foreignkey:groupID"`
+	Users []User `json:"users"`
 }
 
 // GetGroups returns all groups from the database
