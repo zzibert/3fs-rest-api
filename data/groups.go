@@ -68,8 +68,7 @@ func DeleteGroup(id int, db *gorm.DB) (err error) {
 	var group Group
 	if err = db.First(&group, id).Error; err != nil {
 		err = ErrGroupNotFound
-	} else {
-		db.Delete(&group)
 	}
+	err = db.Delete(&group).Error
 	return
 }
