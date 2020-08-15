@@ -48,11 +48,14 @@ func GetGroupById(id int, db *gorm.DB) (group Group, err error) {
 
 // UpdateGroup replaces a group with the given item
 // If a group is not found this func returns a GroupNotFound error
-func UpdateGroup(group *Group, db *gorm.DB) (err error) {
-	if err = db.Save(group).Error; err != nil {
+func UpdateGroup(id int, groupMap map[string]interface{}, db *gorm.DB) (err error) {
+	var group Group
+	if err = db.First(&group, id).Error; err != nil {
 		err = ErrGroupNotFound
+		return
 	}
-	return
+
+	return db.Model(&group).Updates(groupMap).Error
 }
 
 // AddGroup adds a group to the database

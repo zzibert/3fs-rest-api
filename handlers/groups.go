@@ -60,6 +60,7 @@ func (g *Groups) ListSingle(rw http.ResponseWriter, r *http.Request) {
 
 		rw.WriteHeader(http.StatusNotFound)
 		data.ToJSON(&GenericError{Message: err.Error()}, rw)
+		return
 
 	default:
 		g.l.Println("Error fetching group", err)
@@ -85,22 +86,35 @@ func (g *Groups) ListSingle(rw http.ResponseWriter, r *http.Request) {
 
 // Update handles PUT requests to update group
 func (g *Groups) Update(rw http.ResponseWriter, r *http.Request) {
+	id := getId(r)
 
-	// create the group from the request body
-	var group data.Group
-	err := data.FromJSON(&group, r.Body)
+	g.l.Println("Update Group id: ", id)
+
+	groupMap := make(map[string]interface{})
+	err := data.FromJSON(&groupMap, r.Body)
 	if err != nil {
-		g.l.Println("Error couldnt parse group from request body", err)
+		g.l.Println("Error couldnt parse group map from request body", err)
 
 		rw.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	err = data.UpdateGroup(&group, g.Db)
-	if err != nil {
-		g.l.Println("Error group not found", group)
+
+	err = data.UpdateGroup(id, groupMap, g.Db)
+
+	switch err {
+	case nil:
+
+	case data.ErrUserNotFound:
+		g.l.Println("Error updating group", err)
 
 		rw.WriteHeader(http.StatusNotFound)
-		data.ToJSON(&GenericError{Message: "Group not found in database"}, rw)
+		data.ToJSON(&GenericError{Message: err.Error()}, rw)
+		return
+	default:
+		g.l.Println("Error updating group", err)
+
+		rw.WriteHeader(http.StatusInternalServerError)
+		data.ToJSON(&GenericError{Message: err.Error()}, rw)
 		return
 	}
 
