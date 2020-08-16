@@ -1,8 +1,7 @@
 run:
 	go run main.go
 
-start:
-	up run
+start: up run
 
 up:
 	cd docker/ && docker-compose up -d 
