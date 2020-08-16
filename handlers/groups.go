@@ -143,6 +143,7 @@ func (g *Groups) Create(rw http.ResponseWriter, r *http.Request) {
 		g.l.Println("Error creating group", err)
 
 		rw.WriteHeader(http.StatusInternalServerError)
+		data.ToJSON(&GenericError{Message: err.Error()}, rw)
 	}
 }
 

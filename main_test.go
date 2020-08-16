@@ -47,6 +47,7 @@ type GroupTestSuite struct {
 	mux          *http.ServeMux
 	writer       *httptest.ResponseRecorder
 	groupHandler *handlers.Groups
+	group        *data.Group
 }
 
 // the user test suite
@@ -66,15 +67,16 @@ func init() {
 func Test(t *testing.T) { TestingT(t) }
 
 func (s *GroupTestSuite) SetUpSuite(c *C) {
+	s.group = &data.Group{}
 	s.mux = http.NewServeMux()
 	s.groupHandler = handlers.NewGroups(l, db)
 	s.mux.HandleFunc("/groups", s.groupHandler.ListAll)
 	s.writer = httptest.NewRecorder()
 }
 
-func (s *GroupTestSuite) TearDownSuite(c *C) {
+// func (s *GroupTestSuite) TearDownSuite(c *C) {
 
-}
+// }
 
 // Testing that get all groups returns 0 groups
 func (s *GroupTestSuite) TestHandleGetAllEmpty(c *C) {
@@ -89,11 +91,33 @@ func (s *GroupTestSuite) TestHandleGetAllEmpty(c *C) {
 
 // Creating a new group
 func (s *GroupTestSuite) TestHandlePost(c *C) {
-	requestBody := strings.NewReader(`{"name": "group 1"}`)
-	request, _ := http.NewRequest("POST", "/groups", requestBody)
+	json := strings.NewReader(`{"name": "group 1"}`)
+	request, _ := http.NewRequest("POST", "/groups", json)
 	s.mux.ServeHTTP(s.writer, request)
 
 	c.Check(s.writer.Code, Equals, 200)
+	c.Check(s.group.ID, Equals, 1)
+	c.Check(s.group.Name, Equals, "group 1")
 }
 
+// Getting a single group with id
+// func (s *GroupTestSuite) TestHandleListSingle(c *C) {
+// 	request, _ := http.NewRequest("GET", "/groups/1", nil)
+// 	s.mux.ServeHTTP(s.writer, request)
+
+// 	var group data.Group
+//   data.FromJSON(group, s.writer.Body)
+
+//   c.Check(s.writer.Code, Equals, 200)
+//   c.Check(s.writer.)
+// 	c.Check(group.Name, Equals, "group 1")
+// }
+
 // Trying to create a group with the same name
+// func (s *GroupTestSuite) TestHandlePostFail(c *C) {
+// 	requestBody := strings.NewReader(`{"name": "group 1"}`)
+// 	request, _ := http.NewRequest("POST", "/groups", requestBody)
+// 	s.mux.ServeHTTP(s.writer, request)
+
+// 	c.Check(s.writer.Code, Equals, 200)
+// }
