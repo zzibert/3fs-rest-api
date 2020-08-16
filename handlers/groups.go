@@ -139,7 +139,11 @@ func (g *Groups) Create(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data.AddGroup(&group, g.Db)
+	if err = data.AddGroup(&group, g.Db); err != nil {
+		g.l.Println("Error creating group", err)
+
+		rw.WriteHeader(http.StatusInternalServerError)
+	}
 }
 
 // swagger:route DELETE /groups/{id} groups deleteGroup

@@ -62,8 +62,11 @@ func UpdateGroup(id int, groupMap map[string]interface{}, db *gorm.DB) (err erro
 }
 
 // AddGroup adds a group to the database
-func AddGroup(group *Group, db *gorm.DB) {
-	db.Create(group)
+func AddGroup(group *Group, db *gorm.DB) (err error) {
+	if err = db.Create(group).Error; err != nil {
+		err = ErrGroupConstraintViolation
+	}
+	return
 }
 
 // DeleteGroup deletes a group from the database
