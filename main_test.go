@@ -37,23 +37,34 @@ func clearDB() {
 	db.Exec("alter sequence groups_id_seq restart with 1")
 }
 
-type PostTestSuite struct {
+type GroupTestSuite struct {
 	mux          *http.ServeMux
 	writer       *httptest.ResponseRecorder
 	groupHandler *handlers.Groups
 }
 
+type UserTestSuite struct {
+	mux         *http.ServeMux
+	writer      *httptest.ResponseRecorder
+	userHandler *handlers.Users
+}
+
 func init() {
-	Suite(&PostTestSuite{})
+	Suite(&GroupTestSuite{})
+	Suite(&UserTestSuite{})
 }
 
 func Test(t *testing.T) { TestingT(t) }
 
-func (s *PostTestSuite) SetUpTest(c *C) {
+func (s *PostTestSuite) SetUpSuite(c *C) {
 	s.mux = http.NewServeMux()
 	s.groupHandler = handlers.NewGroups(l, db)
 	s.mux.HandleFunc("/groups", s.groupHandler.ListAll)
 	s.writer = httptest.NewRecorder()
+}
+
+func (s *PostTestSuite) TearDownSuite(c *C) {
+
 }
 
 func (s *PostTestSuite) TestHandleGet(c *C) {
