@@ -9,6 +9,9 @@ import (
 // ErrGroupNotFound is an error raised when a group can not be found in the database
 var ErrGroupNotFound = fmt.Errorf("Group not found")
 
+// ErrGroupConstraintViolation is an error raised when a group can not be created because of constraint violations
+var ErrGroupConstraintViolation = fmt.Errorf("group has constraints violation")
+
 // Group defines the structure for an API group
 // swagger:model
 type Group struct {
