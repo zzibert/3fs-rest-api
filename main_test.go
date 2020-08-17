@@ -19,13 +19,13 @@ import (
 var db *gorm.DB
 var l *log.Logger
 
-// Main Test func, initiliazing, running and clearing each test run
-func TestMain(m *testing.M) {
-	initialize()
-	code := m.Run()
-	clearDB()
-	os.Exit(code)
-}
+// // Main Test func, initiliazing, running and clearing each test run
+// func TestMain(m *testing.M) {
+// 	initialize()
+// 	code := m.Run()
+// 	clearDB()
+// 	os.Exit(code)
+// }
 
 // initializing the database connection and creating the logger
 func initialize() {
@@ -67,6 +67,7 @@ func init() {
 func Test(t *testing.T) { TestingT(t) }
 
 func (s *GroupTestSuite) SetUpSuite(c *C) {
+	initialize()
 	s.group = &data.Group{}
 	s.mux = http.NewServeMux()
 	s.groupHandler = handlers.NewGroups(l, db)
@@ -74,9 +75,9 @@ func (s *GroupTestSuite) SetUpSuite(c *C) {
 	s.writer = httptest.NewRecorder()
 }
 
-// func (s *GroupTestSuite) TearDownSuite(c *C) {
-
-// }
+func (s *GroupTestSuite) TearDownSuite(c *C) {
+	clearDB()
+}
 
 // Testing that get all groups returns 0 groups
 func (s *GroupTestSuite) TestHandleGetAllEmpty(c *C) {
@@ -91,13 +92,11 @@ func (s *GroupTestSuite) TestHandleGetAllEmpty(c *C) {
 
 // Creating a new group
 func (s *GroupTestSuite) TestHandlePost(c *C) {
-	json := strings.NewReader(`{"name": "group 1"}`)
-	request, _ := http.NewRequest("POST", "/groups", json)
+	body := strings.NewReader(`{"name": "group 1"}`)
+	request, _ := http.NewRequest("POST", "/groups", body)
 	s.mux.ServeHTTP(s.writer, request)
 
 	c.Check(s.writer.Code, Equals, 200)
-	c.Check(s.group.ID, Equals, 1)
-	c.Check(s.group.Name, Equals, "group 1")
 }
 
 // Getting a single group with id
@@ -106,10 +105,9 @@ func (s *GroupTestSuite) TestHandlePost(c *C) {
 // 	s.mux.ServeHTTP(s.writer, request)
 
 // 	var group data.Group
-//   data.FromJSON(group, s.writer.Body)
+// 	data.FromJSON(group, s.writer.Body)
 
-//   c.Check(s.writer.Code, Equals, 200)
-//   c.Check(s.writer.)
+// 	c.Check(s.writer.Code, Equals, 200)
 // 	c.Check(group.Name, Equals, "group 1")
 // }
 
