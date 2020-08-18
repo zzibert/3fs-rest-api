@@ -316,3 +316,15 @@ func (s *UserTestSuite) TestUserHandlePut(c *C) {
 	json.Unmarshal(s.writer.Body.Bytes(), s.user)
 	c.Check(s.user.Name, Equals, "new user name")
 }
+
+// Trying to update an users groupID to non-existent group
+func (s *UserTestSuite) TestUserHandlePutFail(c *C) {
+	putRouter := s.mux.Methods(http.MethodPut).Subrouter()
+	putRouter.HandleFunc("/users/{id:[0-9]+}", s.userHandler.Update)
+
+	body := strings.NewReader(`{"groupID": 66}`)
+	request, _ := http.NewRequest("PUT", "/users/1", body)
+	s.mux.ServeHTTP(s.writer, request)
+
+	c.Check(s.writer.Code, Equals, 500)
+}
