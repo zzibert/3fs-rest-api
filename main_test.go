@@ -89,6 +89,7 @@ func setDB(db *gorm.DB) {
 	db.Exec("INSERT INTO groups(name) VALUES ('group 1')")
 	db.Exec("INSERT INTO groups(name) VALUES ('group 2')")
 	db.Exec("INSERT INTO users(name, password, email, group_id) VALUES ('user 1', 'pass', 'user@email.com', 1)")
+	db.Exec("INSERT INTO users(name, password, email, group_id) VALUES ('user 2', 'pass', 'user2@email.com', 1)")
 }
 
 func clearDB(db *gorm.DB) {
@@ -226,7 +227,7 @@ func (s *GroupTestSuite) TestGroupHandleDeleteFail(c *C) {
 
 // USERS TESTS
 
-// Tries to fetch a non-existent user with id 2
+// Tries to fetch a non-existent user with id 3
 func (s *UserTestSuite) TestUserHandleGetSingleFail(c *C) {
 
 	getRouter := s.mux.Methods(http.MethodGet).Subrouter()
@@ -257,7 +258,7 @@ func (s *UserTestSuite) TestUserHandlePost(c *C) {
 	postRouter := s.mux.Methods(http.MethodPost).Subrouter()
 	postRouter.HandleFunc("/users", s.userHandler.Create)
 
-	body := strings.NewReader(`{"name": "user 2", "password": "pass", "email": "user2@email.com", "groupID": 1}`)
+	body := strings.NewReader(`{"name": "user 3", "password": "pass", "email": "user3@email.com", "groupID": 1}`)
 	request, _ := http.NewRequest("POST", "/users", body)
 	s.mux.ServeHTTP(s.writer, request)
 
@@ -274,4 +275,21 @@ func (s *UserTestSuite) TestUserHandlePostFail(c *C) {
 	s.mux.ServeHTTP(s.writer, request)
 
 	c.Check(s.writer.Code, Equals, 400)
+}
+
+// Tries to fetch all users
+func (s *UserTestSuite) TestUserHandleGetAll(c *C) {
+
+	getRouter := s.mux.Methods(http.MethodGet).Subrouter()
+	getRouter.HandleFunc("/users", s.userHandler.ListAll)
+
+	request, _ := http.NewRequest("GET", "/users", nil)
+	s.mux.ServeHTTP(s.writer, request)
+
+	c.Check(s.writer.Code, Equals, 200)
+
+	var users []data.Group
+	json.Unmarshal(s.writer.Body.Bytes(), &users)
+	c.Check(users[0].Name, Equals, "user 1")
+	c.Check(users[1].Name, Equals, "user 2")
 }
