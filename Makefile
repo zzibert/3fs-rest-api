@@ -9,7 +9,7 @@ up:
 down:
 	cd docker && docker-compose down
 
-test:
+test: up
 	go test -check.vv
 
 check_install:
