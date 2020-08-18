@@ -90,8 +90,8 @@ paths:
       operationId: createGroup
       responses:
         "200":
-          $ref: '#/responses/groupResponse'
-        "501":
+          $ref: '#/responses/noContentResponse'
+        "400":
           $ref: '#/responses/errorResponse'
       tags:
       - groups
@@ -99,7 +99,7 @@ paths:
       description: Update a group
       operationId: updateGroup
       responses:
-        "201":
+        "204":
           $ref: '#/responses/noContentResponse'
         "404":
           $ref: '#/responses/errorResponse'
@@ -110,11 +110,11 @@ paths:
       description: Delete a group
       operationId: deleteGroup
       responses:
-        "201":
+        "200":
           $ref: '#/responses/noContentResponse'
-        "404":
+        "400":
           $ref: '#/responses/errorResponse'
-        "501":
+        "404":
           $ref: '#/responses/errorResponse'
       tags:
       - groups
@@ -142,8 +142,8 @@ paths:
       operationId: createUser
       responses:
         "200":
-          $ref: '#/responses/userResponse'
-        "501":
+          $ref: '#/responses/noContentResponse'
+        "400":
           $ref: '#/responses/errorResponse'
       tags:
       - users
@@ -162,11 +162,9 @@ paths:
       description: Deletes an user from the database
       operationId: deleteUser
       responses:
-        "201":
+        "204":
           $ref: '#/responses/noContentResponse'
         "404":
-          $ref: '#/responses/errorResponse'
-        "501":
           $ref: '#/responses/errorResponse'
       tags:
       - users

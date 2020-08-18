@@ -48,14 +48,8 @@ func init() {
 	}
 	l := log.New(os.Stdout, "3fs-rest-api", log.LstdFlags)
 
-	Suite(&GroupTestSuite{
-		l:  l,
-		db: db,
-	})
-	Suite(&UserTestSuite{
-		l:  l,
-		db: db,
-	})
+	Suite(&GroupTestSuite{l: l, db: db})
+	Suite(&UserTestSuite{l: l, db: db})
 }
 
 // integrates with testing package
