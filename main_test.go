@@ -138,3 +138,27 @@ func (s *GroupTestSuite) TestGroupHandleGetAll(c *C) {
 	json.Unmarshal(s.writer.Body.Bytes(), &groups)
 	c.Check((*groups)[0].Name, Equals, "group 1")
 }
+
+// Trying to update a group with id 1
+func (s *GroupTestSuite) TestGroupHandlePut(c *C) {
+	putRouter := s.mux.Methods(http.MethodPut).Subrouter()
+	putRouter.HandleFunc("/groups/{id:[0-9]+}", s.groupHandler.Update)
+
+	body := strings.NewReader(`{"name": "new group name"}`)
+	request, _ := http.NewRequest("PUT", "/groups/1", body)
+	s.mux.ServeHTTP(s.writer, request)
+
+	c.Check(s.writer.Code, Equals, 204)
+
+	getRouter := s.mux.Methods(http.MethodGet).Subrouter()
+	getRouter.HandleFunc("/groups/{id:[0-9]+}", s.groupHandler.ListSingle)
+
+	request, _ = http.NewRequest("GET", "/groups/1", nil)
+	s.writer = httptest.NewRecorder()
+	s.mux.ServeHTTP(s.writer, request)
+
+	c.Check(s.writer.Code, Equals, 200)
+	json.Unmarshal(s.writer.Body.Bytes(), s.group)
+	c.Check(s.group.Name, Equals, "new group name")
+
+}
