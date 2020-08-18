@@ -163,13 +163,25 @@ func (s *GroupTestSuite) TestGroupHandlePut(c *C) {
 }
 
 //trying to delete a group
-// func (s *GroupTestSuite) TestGroupHandleDelete(c *C) {
-// 	deleteRouter := s.mux.Methods(http.MethodDelete).Subrouter()
-// 	deleteRouter.HandleFunc("/groups/{id:[0-9]+}", s.groupHandler.Delete)
+func (s *GroupTestSuite) TestGroupHandleDelete(c *C) {
+	deleteRouter := s.mux.Methods(http.MethodDelete).Subrouter()
+	deleteRouter.HandleFunc("/groups/{id:[0-9]+}", s.groupHandler.Delete)
 
-// 	request, _ := http.NewRequest("DELETE", "/groups/1", nil)
-// 	s.mux.ServeHTTP(s.writer, request)
+	request, _ := http.NewRequest("DELETE", "/groups/2", nil)
+	s.mux.ServeHTTP(s.writer, request)
 
-// 	c.Check(s.writer.Code, Equals, 200)
+	c.Check(s.writer.Code, Equals, 200)
 
-// }
+	getRouter := s.mux.Methods(http.MethodGet).Subrouter()
+	getRouter.HandleFunc("/groups", s.groupHandler.ListAll)
+
+	request, _ = http.NewRequest("GET", "/groups", nil)
+	s.writer = httptest.NewRecorder()
+	s.mux.ServeHTTP(s.writer, request)
+
+	c.Check(s.writer.Code, Equals, 200)
+	var groups []data.Group
+	json.Unmarshal(s.writer.Body.Bytes(), &groups)
+	c.Check(len(groups), Equals, 1)
+
+}
