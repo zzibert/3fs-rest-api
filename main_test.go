@@ -10,6 +10,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
+	"github.com/zzibert/3fs-rest-api/data"
 	"github.com/zzibert/3fs-rest-api/handlers"
 	. "gopkg.in/check.v1"
 )
@@ -17,6 +18,9 @@ import (
 // Creates test suite
 type GroupTestSuite struct {
 	groupHandler *handlers.Groups
+	group        *data.Group
+	writer       *httptest.ResponseRecorder
+	sm           *mux.Router
 }
 
 // Registering test suite
@@ -38,13 +42,18 @@ func init() {
 // integrates with testing package
 func Test(t *testing.T) { TestingT(t) }
 
-func (s *GroupTestSuite) TestHandleGet(c *C) {
-	sm := mux.NewRouter()
-	getRouter := sm.Methods(http.MethodGet).Subrouter()
-	getRouter.HandleFunc("/users/{id:[0-9]+}", s.groupHandler.ListSingle)
-	writer := httptest.NewRecorder()
-	request, _ := http.NewRequest("GET", "/groups/1", nil)
-	sm.ServeHTTP(writer, request)
+func (s *GroupTestSuite) SetUpSuite(c *C) {
+	s.sm = mux.NewRouter()
+	s.writer = httptest.NewRecorder()
+}
 
-	c.Check(writer.Code, Equals, 200)
+func (s *GroupTestSuite) TestHandleGet(c *C) {
+
+	getRouter := s.sm.Methods(http.MethodGet).Subrouter()
+	getRouter.HandleFunc("/users/{id:[0-9]+}", s.groupHandler.ListSingle)
+
+	request, _ := http.NewRequest("GET", "/groups/1", nil)
+	s.sm.ServeHTTP(s.writer, request)
+
+	c.Check(s.writer.Code, Equals, 200)
 }
