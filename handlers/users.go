@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -18,14 +17,6 @@ type Users struct {
 // NewUsers returns a new users handler with the given logger
 func NewUsers(l *log.Logger, db *gorm.DB) *Users {
 	return &Users{l, db}
-}
-
-// ErrInvalidUserPath is an error when user path is not valid
-var ErrInvalidUserPath = fmt.Errorf("Invalid path, path should be /users/[id]")
-
-// GenericError is a generic error message
-type GenericError struct {
-	Message string `json:"message"`
 }
 
 // swagger:route GET /users users ListUsers
