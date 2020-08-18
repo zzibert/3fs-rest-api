@@ -98,6 +98,8 @@ func clearDB(db *gorm.DB) {
 	db.Exec("ALTER SEQUENCE groups_id_seq RESTART WITH 1")
 }
 
+//GROUP TESTS
+
 // Tries to fetch a non-existent group with id 2
 func (s *GroupTestSuite) TestGroupHandleGetSingleFail(c *C) {
 
@@ -220,4 +222,32 @@ func (s *GroupTestSuite) TestGroupHandleDeleteFail(c *C) {
 	s.mux.ServeHTTP(s.writer, request)
 
 	c.Check(s.writer.Code, Equals, 500)
+}
+
+// USERS TESTS
+
+// Tries to fetch a non-existent user with id 2
+func (s *UserTestSuite) TestUserHandleGetSingleFail(c *C) {
+
+	getRouter := s.mux.Methods(http.MethodGet).Subrouter()
+	getRouter.HandleFunc("/users/{id:[0-9]+}", s.userHandler.ListSingle)
+
+	request, _ := http.NewRequest("GET", "/users/3", nil)
+	s.mux.ServeHTTP(s.writer, request)
+
+	c.Check(s.writer.Code, Equals, 404)
+}
+
+// Tries to fetch a user with id 1
+func (s *UserTestSuite) TestUserHandleGetSingle(c *C) {
+
+	getRouter := s.mux.Methods(http.MethodGet).Subrouter()
+	getRouter.HandleFunc("/users/{id:[0-9]+}", s.userHandler.ListSingle)
+
+	request, _ := http.NewRequest("GET", "/users/1", nil)
+	s.mux.ServeHTTP(s.writer, request)
+
+	c.Check(s.writer.Code, Equals, 200)
+	json.Unmarshal(s.writer.Body.Bytes(), s.user)
+	c.Check(s.user.Name, Equals, "user 1")
 }
