@@ -263,3 +263,15 @@ func (s *UserTestSuite) TestUserHandlePost(c *C) {
 
 	c.Check(s.writer.Code, Equals, 200)
 }
+
+// Tries to create a user with an existing name
+func (s *UserTestSuite) TestUserHandlePostFail(c *C) {
+	postRouter := s.mux.Methods(http.MethodPost).Subrouter()
+	postRouter.HandleFunc("/users", s.userHandler.Create)
+
+	body := strings.NewReader(`{"name": "user 1", "password": "pass", "email": "user43@email.com", "groupID": 1}`)
+	request, _ := http.NewRequest("POST", "/users", body)
+	s.mux.ServeHTTP(s.writer, request)
+
+	c.Check(s.writer.Code, Equals, 400)
+}
