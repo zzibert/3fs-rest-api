@@ -47,30 +47,29 @@ func init() {
 // integrates with testing package
 func Test(t *testing.T) { TestingT(t) }
 
-func (s *GroupTestSuite) SetUpSuite(c *C) {
-	setDB(s.db)
-}
-
 func (s *GroupTestSuite) SetUpTest(c *C) {
 	s.writer = httptest.NewRecorder()
 	s.group = &data.Group{}
 	s.mux = mux.NewRouter()
 	s.groupHandler = handlers.NewGroups(s.l, s.db)
+	setDB(s.db)
 }
 
-func (s *GroupTestSuite) TearDownSuite(c *C) {
+func (s *GroupTestSuite) TearDownTest(c *C) {
 	clearDB(s.db)
 }
 
 func setDB(db *gorm.DB) {
 	db.Exec("INSERT INTO groups(name) VALUES ('group 1')")
+	db.Exec("INSERT INTO groups(name) VALUES ('group 2')")
+	db.Exec("INSERT INTO users(name, password, email, group_id) VALUES ('user 1', 'pass', 'user@email.com', 1)")
 }
 
 func clearDB(db *gorm.DB) {
-	db.Exec("delete from groups")
-	db.Exec("ALTER SEQUENCE groups_id_seq RESTART WITH 1")
 	db.Exec("delete from users")
 	db.Exec("ALTER SEQUENCE users_id_seq RESTART WITH 1")
+	db.Exec("delete from groups")
+	db.Exec("ALTER SEQUENCE groups_id_seq RESTART WITH 1")
 }
 
 // Tries to fetch a non-existent group with id 2
@@ -79,22 +78,10 @@ func (s *GroupTestSuite) TestGroupHandleGetSingleFail(c *C) {
 	getRouter := s.mux.Methods(http.MethodGet).Subrouter()
 	getRouter.HandleFunc("/groups/{id:[0-9]+}", s.groupHandler.ListSingle)
 
-	request, _ := http.NewRequest("GET", "/groups/2", nil)
+	request, _ := http.NewRequest("GET", "/groups/3", nil)
 	s.mux.ServeHTTP(s.writer, request)
 
 	c.Check(s.writer.Code, Equals, 404)
-}
-
-// Tries to create a new group
-func (s *GroupTestSuite) TestGroupHandlePost(c *C) {
-	postRouter := s.mux.Methods(http.MethodPost).Subrouter()
-	postRouter.HandleFunc("/groups", s.groupHandler.Create)
-
-	body := strings.NewReader(`{"name": "group 2"}`)
-	request, _ := http.NewRequest("POST", "/groups", body)
-	s.mux.ServeHTTP(s.writer, request)
-
-	c.Check(s.writer.Code, Equals, 200)
 }
 
 // Tries to fetch a group with id 1
@@ -109,6 +96,18 @@ func (s *GroupTestSuite) TestGroupHandleGetSingle(c *C) {
 	c.Check(s.writer.Code, Equals, 200)
 	json.Unmarshal(s.writer.Body.Bytes(), s.group)
 	c.Check(s.group.Name, Equals, "group 1")
+}
+
+// Tries to create a new group
+func (s *GroupTestSuite) TestGroupHandlePost(c *C) {
+	postRouter := s.mux.Methods(http.MethodPost).Subrouter()
+	postRouter.HandleFunc("/groups", s.groupHandler.Create)
+
+	body := strings.NewReader(`{"name": "group 3"}`)
+	request, _ := http.NewRequest("POST", "/groups", body)
+	s.mux.ServeHTTP(s.writer, request)
+
+	c.Check(s.writer.Code, Equals, 200)
 }
 
 // Tries to create a group with an existing name
@@ -137,6 +136,7 @@ func (s *GroupTestSuite) TestGroupHandleGetAll(c *C) {
 	var groups *[]data.Group
 	json.Unmarshal(s.writer.Body.Bytes(), &groups)
 	c.Check((*groups)[0].Name, Equals, "group 1")
+	c.Check((*groups)[1].Name, Equals, "group 2")
 }
 
 // Trying to update a group with id 1
@@ -160,5 +160,16 @@ func (s *GroupTestSuite) TestGroupHandlePut(c *C) {
 	c.Check(s.writer.Code, Equals, 200)
 	json.Unmarshal(s.writer.Body.Bytes(), s.group)
 	c.Check(s.group.Name, Equals, "new group name")
-
 }
+
+//trying to delete a group
+// func (s *GroupTestSuite) TestGroupHandleDelete(c *C) {
+// 	deleteRouter := s.mux.Methods(http.MethodDelete).Subrouter()
+// 	deleteRouter.HandleFunc("/groups/{id:[0-9]+}", s.groupHandler.Delete)
+
+// 	request, _ := http.NewRequest("DELETE", "/groups/1", nil)
+// 	s.mux.ServeHTTP(s.writer, request)
+
+// 	c.Check(s.writer.Code, Equals, 200)
+
+// }
