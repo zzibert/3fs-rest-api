@@ -111,13 +111,30 @@ func (s *GroupTestSuite) TestGroupHandleGetSingle(c *C) {
 	c.Check(s.group.Name, Equals, "group 1")
 }
 
-// func (s *GroupTestSuite) TestGroupHandleGetAll(c *C) {
+// Tries to create a group with an existing name
+func (s *GroupTestSuite) TestGroupHandlePostFail(c *C) {
+	postRouter := s.mux.Methods(http.MethodPost).Subrouter()
+	postRouter.HandleFunc("/groups", s.groupHandler.Create)
 
-// 	getRouter := s.mux.Methods(http.MethodGet).Subrouter()
-// 	getRouter.HandleFunc("/users}", s.groupHandler.ListSingle)
+	body := strings.NewReader(`{"name": "group 1"}`)
+	request, _ := http.NewRequest("POST", "/groups", body)
+	s.mux.ServeHTTP(s.writer, request)
 
-// 	request, _ := http.NewRequest("GET", "/groups/1", nil)
-// 	s.mux.ServeHTTP(s.writer, request)
+	c.Check(s.writer.Code, Equals, 500)
+}
 
-// 	c.Check(s.writer.Code, Equals, 200)
-// }
+// Tries to fetch all groups
+func (s *GroupTestSuite) TestGroupHandleGetAll(c *C) {
+
+	getRouter := s.mux.Methods(http.MethodGet).Subrouter()
+	getRouter.HandleFunc("/groups", s.groupHandler.ListAll)
+
+	request, _ := http.NewRequest("GET", "/groups", nil)
+	s.mux.ServeHTTP(s.writer, request)
+
+	c.Check(s.writer.Code, Equals, 200)
+
+	var groups *[]data.Group
+	json.Unmarshal(s.writer.Body.Bytes(), &groups)
+	c.Check((*groups)[0].Name, Equals, "group 1")
+}
