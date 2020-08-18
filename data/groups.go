@@ -49,8 +49,9 @@ func GetGroupById(id int, db *gorm.DB) (group Group, err error) {
 	return
 }
 
-// UpdateGroup replaces a group with the given item
+// UpdateGroup replaces the set of values within the given group
 // If a group is not found this func returns a GroupNotFound error
+// if the update would make a constraint violation the func returns a ErrGroupConstraintViolation error
 func UpdateGroup(id int, groupMap map[string]interface{}, db *gorm.DB) (err error) {
 	var group Group
 	if err = db.First(&group, id).Error; err != nil {
@@ -58,10 +59,14 @@ func UpdateGroup(id int, groupMap map[string]interface{}, db *gorm.DB) (err erro
 		return
 	}
 
-	return db.Model(&group).Updates(groupMap).Error
+	if err = db.Model(&group).Updates(groupMap).Error; err != nil {
+		err = ErrGroupConstraintViolation
+	}
+	return
 }
 
 // AddGroup adds a group to the database
+// if the group would make a constraint violation the func returns a ErrGroupConstraintViolation error
 func AddGroup(group *Group, db *gorm.DB) (err error) {
 	if err = db.Create(group).Error; err != nil {
 		err = ErrGroupConstraintViolation
@@ -70,11 +75,14 @@ func AddGroup(group *Group, db *gorm.DB) (err error) {
 }
 
 // DeleteGroup deletes a group from the database
+// if the deletion of the group would make a constraint violation the func returns a ErrGroupConstraintViolation error
 func DeleteGroup(id int, db *gorm.DB) (err error) {
 	var group Group
 	if err = db.First(&group, id).Error; err != nil {
 		err = ErrGroupNotFound
 	}
-	err = db.Delete(&group).Error
+	if err = db.Delete(&group).Error; err != nil {
+		err = ErrGroupConstraintViolation
+	}
 	return
 }
