@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"strings"
 	"testing"
 
 	"github.com/gorilla/mux"
@@ -28,7 +27,7 @@ type GroupTestSuite struct {
 
 // Registering test suite
 func init() {
-	connection := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", "localhost", "5433", "zanzibert", "nekineki", "test")
+	connection := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", "localhost", "5432", "zanzibert", "nekineki", "postgres")
 
 	// Opening a connection to the postgres database
 	db, err := gorm.Open("postgres", connection)
@@ -64,25 +63,48 @@ func (s *GroupTestSuite) TearDownSuite(c *C) {
 	clearDB(s.db)
 }
 
-func (s *GroupTestSuite) TestGroupHandlePost(c *C) {
-	postRouter := s.mux.Methods(http.MethodPost).Subrouter()
-	postRouter.HandleFunc("/groups", s.groupHandler.Create)
-
-	body := strings.NewReader(`{"name": "group 1"}`)
-	request, _ := http.NewRequest("POST", "/groups", body)
-	s.mux.ServeHTTP(s.writer, request)
-
-	c.Check(s.writer.Code, Equals, 200)
-
-}
-
-func (s *GroupTestSuite) TestGroupHandleGetSingle(c *C) {
+// Tries to fetch a non-existent group with id 1
+func (s *GroupTestSuite) TestGroupHandleGetSingleFail(c *C) {
 
 	getRouter := s.mux.Methods(http.MethodGet).Subrouter()
-	getRouter.HandleFunc("/users/{id:[0-9]+}", s.groupHandler.ListSingle)
+	getRouter.HandleFunc("/groups/{id:[0-9]+}", s.groupHandler.ListSingle)
 
 	request, _ := http.NewRequest("GET", "/groups/1", nil)
 	s.mux.ServeHTTP(s.writer, request)
 
 	c.Check(s.writer.Code, Equals, 200)
 }
+
+// func (s *GroupTestSuite) TestGroupHandlePost(c *C) {
+// 	postRouter := s.mux.Methods(http.MethodPost).Subrouter()
+// 	postRouter.HandleFunc("/groups", s.groupHandler.Create)
+
+// 	body := strings.NewReader(`{"name": "group 1"}`)
+// 	request, _ := http.NewRequest("POST", "/groups", body)
+// 	s.mux.ServeHTTP(s.writer, request)
+
+// 	c.Check(s.writer.Code, Equals, 200)
+
+// }
+
+// func (s *GroupTestSuite) TestGroupHandleGetSingle(c *C) {
+
+// 	getRouter := s.mux.Methods(http.MethodGet).Subrouter()
+// 	getRouter.HandleFunc("/users/{id:[0-9]+}", s.groupHandler.ListSingle)
+
+// 	request, _ := http.NewRequest("GET", "/groups/1", nil)
+// 	s.mux.ServeHTTP(s.writer, request)
+
+// 	c.Check(s.writer.Code, Equals, 200)
+// }
+
+// func (s *GroupTestSuite) TestGroupHandleGetAll(c *C) {
+
+// 	getRouter := s.mux.Methods(http.MethodGet).Subrouter()
+// 	getRouter.HandleFunc("/users}", s.groupHandler.ListSingle)
+
+// 	request, _ := http.NewRequest("GET", "/groups/1", nil)
+// 	s.mux.ServeHTTP(s.writer, request)
+
+// 	c.Check(s.writer.Code, Equals, 200)
+// }
