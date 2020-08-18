@@ -9,6 +9,9 @@ import (
 // ErrUserNotFound is an error raised when a user can not be found in the database
 var ErrUserNotFound = fmt.Errorf("User not found")
 
+// ErrUserConstraintViolation is an error raised when an user can not be created because of constraint violations
+var ErrUserConstraintViolation = fmt.Errorf("user has constraints violation")
+
 // User defines the structure for an API User
 // swagger:model
 type User struct {
@@ -64,8 +67,9 @@ func GetUserById(id int, db *gorm.DB) (user User, err error) {
 	return
 }
 
-// UpdateUser replaces a user with the given item
-// If the user is not found this func returns UserNotFound error
+// UpdateUser replaces the set of values within the given user
+// If a user is not found this func returns a UserNotFound error
+// if the update would make a constraint violation the func returns a ErrUserConstraintViolation error
 func UpdateUser(id int, userMap map[string]interface{}, db *gorm.DB) (err error) {
 	var user User
 	if err = db.First(&user, id).Error; err != nil {
@@ -73,12 +77,18 @@ func UpdateUser(id int, userMap map[string]interface{}, db *gorm.DB) (err error)
 		return
 	}
 
-	return db.Model(&user).Updates(userMap).Error
+	if err = db.Model(&user).Updates(userMap).Error; err != nil {
+		err = ErrUserConstraintViolation
+	}
+	return
 }
 
-// AddUser adds a new user to the database
+// AddUser adds a user to the database
+// if the user would make a constraint violation the func returns a ErrUserConstraintViolation error
 func AddUser(user *User, db *gorm.DB) (err error) {
-	err = db.Create(user).Error
+	if err = db.Create(user).Error; err != nil {
+		err = ErrUserConstraintViolation
+	}
 	return
 }
 
