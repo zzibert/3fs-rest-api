@@ -30,7 +30,7 @@ func (u *Users) ListAll(rw http.ResponseWriter, r *http.Request) {
 
 	users := data.GetUsers(u.Db)
 
-	err := data.ToJSON(users, rw)
+	err := data.ToJSON(&users, rw)
 	if err != nil {
 		u.l.Println("error encoding users")
 	}
@@ -106,6 +106,11 @@ func (u *Users) Update(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusNotFound)
 		data.ToJSON(&GenericError{Message: err.Error()}, rw)
 		return
+	case data.ErrUserConstraintViolation:
+		u.l.Println("Error updating user", err)
+		rw.WriteHeader(http.StatusNotFound)
+		data.ToJSON(&GenericError{Message: err.Error()}, rw)
+		return
 	default:
 		u.l.Println("Error updating user", err)
 
@@ -121,8 +126,8 @@ func (u *Users) Update(rw http.ResponseWriter, r *http.Request) {
 // Create a new User
 //
 // responses:
-//  200: userResponse
-//  501: errorResponse
+//  200: noContentResponse
+//  400: errorResponse
 
 // Create handles POST requests to add new users
 func (u *Users) Create(rw http.ResponseWriter, r *http.Request) {
@@ -140,6 +145,7 @@ func (u *Users) Create(rw http.ResponseWriter, r *http.Request) {
 		u.l.Println("Error adding user: ", err)
 
 		rw.WriteHeader(http.StatusBadRequest)
+		data.ToJSON(&GenericError{Message: err.Error()}, rw)
 	}
 }
 
@@ -147,9 +153,8 @@ func (u *Users) Create(rw http.ResponseWriter, r *http.Request) {
 // Deletes an user from the database
 //
 // responses:
-//  201: noContentResponse
+//  204: noContentResponse
 //  404: errorResponse
-//  501: errorResponse
 
 // DeleteUser handles DELETE requests for deleting an user from the database
 func (u *Users) Delete(rw http.ResponseWriter, r *http.Request) {

@@ -148,7 +148,7 @@ func (s *GroupTestSuite) TestGroupHandlePostFail(c *C) {
 	request, _ := http.NewRequest("POST", "/groups", body)
 	s.mux.ServeHTTP(s.writer, request)
 
-	c.Check(s.writer.Code, Equals, 500)
+	c.Check(s.writer.Code, Equals, 400)
 }
 
 // Tries to fetch all groups
@@ -199,7 +199,7 @@ func (s *GroupTestSuite) TestGroupHandleDelete(c *C) {
 	request, _ := http.NewRequest("DELETE", "/groups/1", nil)
 	s.mux.ServeHTTP(s.writer, request)
 
-	c.Check(s.writer.Code, Equals, 500)
+	c.Check(s.writer.Code, Equals, 400)
 }
 
 //trying to delete a group
@@ -325,7 +325,7 @@ func (s *UserTestSuite) TestUserHandlePutFail(c *C) {
 	request, _ := http.NewRequest("PUT", "/users/1", body)
 	s.mux.ServeHTTP(s.writer, request)
 
-	c.Check(s.writer.Code, Equals, 500)
+	c.Check(s.writer.Code, Equals, 404)
 }
 
 // Trying to delete a user

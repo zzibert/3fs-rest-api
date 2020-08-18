@@ -122,7 +122,7 @@ func (g *Groups) Update(rw http.ResponseWriter, r *http.Request) {
 //
 // responses:
 //  200: noContentResponse
-//  501: errorResponse
+//  400: errorResponse
 
 // Create handles POST requests to add a new group
 func (g *Groups) Create(rw http.ResponseWriter, r *http.Request) {
@@ -138,7 +138,7 @@ func (g *Groups) Create(rw http.ResponseWriter, r *http.Request) {
 	if err = data.AddGroup(&group, g.Db); err != nil {
 		g.l.Println("Error creating group", err)
 
-		rw.WriteHeader(http.StatusInternalServerError)
+		rw.WriteHeader(http.StatusBadRequest)
 		data.ToJSON(&GenericError{Message: err.Error()}, rw)
 	}
 }
@@ -149,7 +149,7 @@ func (g *Groups) Create(rw http.ResponseWriter, r *http.Request) {
 // responses:
 //  200: noContentResponse
 //  404: errorResponse
-//  501: errorResponse
+//  400: errorResponse
 
 // Delete handles DELETE requests and deletes group from the database
 func (g *Groups) Delete(rw http.ResponseWriter, r *http.Request) {
@@ -165,6 +165,12 @@ func (g *Groups) Delete(rw http.ResponseWriter, r *http.Request) {
 		g.l.Println("Error deleting group id does not exist")
 
 		rw.WriteHeader(http.StatusNotFound)
+		data.ToJSON(&GenericError{Message: err.Error()}, rw)
+		return
+	case data.ErrGroupConstraintViolation:
+		g.l.Println("Error deleting group", err)
+
+		rw.WriteHeader(http.StatusBadRequest)
 		data.ToJSON(&GenericError{Message: err.Error()}, rw)
 		return
 	default:
