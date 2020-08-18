@@ -328,3 +328,25 @@ func (s *UserTestSuite) TestUserHandlePutFail(c *C) {
 
 	c.Check(s.writer.Code, Equals, 500)
 }
+
+// Trying to delete a user
+func (s *UserTestSuite) TestUserHandleDelete(c *C) {
+	deleteRouter := s.mux.Methods(http.MethodDelete).Subrouter()
+	deleteRouter.HandleFunc("/users/{id:[0-9]+}", s.userHandler.Delete)
+
+	request, _ := http.NewRequest("DELETE", "/users/1", nil)
+	s.mux.ServeHTTP(s.writer, request)
+
+	c.Check(s.writer.Code, Equals, 204)
+}
+
+// Trying to delete a non-existent user
+func (s *UserTestSuite) TestUserHandleDeleteFail(c *C) {
+	deleteRouter := s.mux.Methods(http.MethodDelete).Subrouter()
+	deleteRouter.HandleFunc("/users/{id:[0-9]+}", s.userHandler.Delete)
+
+	request, _ := http.NewRequest("DELETE", "/users/14", nil)
+	s.mux.ServeHTTP(s.writer, request)
+
+	c.Check(s.writer.Code, Equals, 404)
+}
