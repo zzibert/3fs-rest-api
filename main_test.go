@@ -210,7 +210,7 @@ func (s *GroupTestSuite) TestGroupHandleDeleteFailOne(c *C) {
 	request, _ := http.NewRequest("DELETE", "/groups/2", nil)
 	s.mux.ServeHTTP(s.writer, request)
 
-	c.Check(s.writer.Code, Equals, 200)
+	c.Check(s.writer.Code, Equals, 204)
 }
 
 // Trying to delete an non-existend group
@@ -221,7 +221,7 @@ func (s *GroupTestSuite) TestGroupHandleDeleteFailTwo(c *C) {
 	request, _ := http.NewRequest("DELETE", "/groups/5", nil)
 	s.mux.ServeHTTP(s.writer, request)
 
-	c.Check(s.writer.Code, Equals, 500)
+	c.Check(s.writer.Code, Equals, 404)
 }
 
 // USERS TESTS

@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -19,9 +18,6 @@ type Groups struct {
 func NewGroups(l *log.Logger, db *gorm.DB) *Groups {
 	return &Groups{l, db}
 }
-
-// ErrInvalidGroupPath is an error message when the group path is not valid
-var ErrInvalidGroupPath = fmt.Errorf("Invalid Path, path should be /groups/[id]")
 
 // swagger:route GET /groups groups ListGroups
 // Return a list of groups from the database
@@ -50,6 +46,8 @@ func (g *Groups) ListAll(rw http.ResponseWriter, r *http.Request) {
 func (g *Groups) ListSingle(rw http.ResponseWriter, r *http.Request) {
 	id := getId(r)
 
+	g.l.Println("get group id", id)
+
 	group, err := data.GetGroupById(id, g.Db)
 
 	switch err {
@@ -61,7 +59,6 @@ func (g *Groups) ListSingle(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusNotFound)
 		data.ToJSON(&GenericError{Message: err.Error()}, rw)
 		return
-
 	default:
 		g.l.Println("Error fetching group", err)
 
@@ -74,14 +71,13 @@ func (g *Groups) ListSingle(rw http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		g.l.Println("Error encoding group", err)
 	}
-
 }
 
 // swagger:route PUT /groups groups updateGroup
 // Update a group
 //
 // responses:
-// 201: noContentResponse
+// 204: noContentResponse
 // 404: errorResponse
 
 // Update handles PUT requests to update group
@@ -104,7 +100,7 @@ func (g *Groups) Update(rw http.ResponseWriter, r *http.Request) {
 	switch err {
 	case nil:
 
-	case data.ErrUserNotFound:
+	case data.ErrGroupNotFound:
 		g.l.Println("Error updating group", err)
 
 		rw.WriteHeader(http.StatusNotFound)
@@ -125,7 +121,7 @@ func (g *Groups) Update(rw http.ResponseWriter, r *http.Request) {
 // Create a new group
 //
 // responses:
-//  200: groupResponse
+//  200: noContentResponse
 //  501: errorResponse
 
 // Create handles POST requests to add a new group
@@ -151,30 +147,32 @@ func (g *Groups) Create(rw http.ResponseWriter, r *http.Request) {
 // Delete a group
 //
 // responses:
-//  201: noContentResponse
+//  200: noContentResponse
 //  404: errorResponse
-// 501: errorResponse
+//  501: errorResponse
 
 // Delete handles DELETE requests and deletes group from the database
 func (g *Groups) Delete(rw http.ResponseWriter, r *http.Request) {
 	id := getId(r)
 
-	g.l.Println("Error deleting group with id ", id)
+	g.l.Println("deleting group with id ", id)
 
 	err := data.DeleteGroup(id, g.Db)
-	if err == data.ErrGroupNotFound {
+	switch err {
+	case nil:
+
+	case data.ErrGroupNotFound:
 		g.l.Println("Error deleting group id does not exist")
 
 		rw.WriteHeader(http.StatusNotFound)
 		data.ToJSON(&GenericError{Message: err.Error()}, rw)
 		return
-	}
-
-	if err != nil {
+	default:
 		g.l.Println("Error deleting group", err)
 
 		rw.WriteHeader(http.StatusInternalServerError)
 		data.ToJSON(&GenericError{Message: err.Error()}, rw)
 		return
 	}
+	rw.WriteHeader(http.StatusNoContent)
 }

@@ -187,6 +187,28 @@ responses:
     description: Generic error message returned as a string
     schema:
       $ref: '#/definitions/GenericError'
+  groupResponse:
+    description: A single group
+    schema:
+      $ref: '#/definitions/Group'
+  groupsResponse:
+    description: A list of groups
+    schema:
+      items:
+        $ref: '#/definitions/Group'
+      type: array
+  noContentResponse:
+    description: No content is returned by this API endpoint
+  userResponse:
+    description: A single user
+    schema:
+      $ref: '#/definitions/User'
+  usersResponse:
+    description: A list of users
+    schema:
+      items:
+        $ref: '#/definitions/User'
+      type: array
 schemes:
 - http
 swagger: "2.0"
