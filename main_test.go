@@ -183,5 +183,15 @@ func (s *GroupTestSuite) TestGroupHandleDelete(c *C) {
 	var groups []data.Group
 	json.Unmarshal(s.writer.Body.Bytes(), &groups)
 	c.Check(len(groups), Equals, 1)
+}
 
+// Trying to delete an non-existend group
+func (s *GroupTestSuite) TestGroupHandleDeleteFail(c *C) {
+	deleteRouter := s.mux.Methods(http.MethodDelete).Subrouter()
+	deleteRouter.HandleFunc("/groups/{id:[0-9]+}", s.groupHandler.Delete)
+
+	request, _ := http.NewRequest("DELETE", "/groups/5", nil)
+	s.mux.ServeHTTP(s.writer, request)
+
+	c.Check(s.writer.Code, Equals, 500)
 }
