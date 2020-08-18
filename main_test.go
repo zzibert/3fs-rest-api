@@ -251,3 +251,15 @@ func (s *UserTestSuite) TestUserHandleGetSingle(c *C) {
 	json.Unmarshal(s.writer.Body.Bytes(), s.user)
 	c.Check(s.user.Name, Equals, "user 1")
 }
+
+// Tries to create a new user
+func (s *UserTestSuite) TestUserHandlePost(c *C) {
+	postRouter := s.mux.Methods(http.MethodPost).Subrouter()
+	postRouter.HandleFunc("/users", s.userHandler.Create)
+
+	body := strings.NewReader(`{"name": "user 2", "password": "pass", "email": "user2@email.com", "groupID": 1}`)
+	request, _ := http.NewRequest("POST", "/users", body)
+	s.mux.ServeHTTP(s.writer, request)
+
+	c.Check(s.writer.Code, Equals, 200)
+}
