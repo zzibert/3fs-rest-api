@@ -293,3 +293,26 @@ func (s *UserTestSuite) TestUserHandleGetAll(c *C) {
 	c.Check(users[0].Name, Equals, "user 1")
 	c.Check(users[1].Name, Equals, "user 2")
 }
+
+// Trying to update a user with id 1
+func (s *UserTestSuite) TestUserHandlePut(c *C) {
+	putRouter := s.mux.Methods(http.MethodPut).Subrouter()
+	putRouter.HandleFunc("/users/{id:[0-9]+}", s.userHandler.Update)
+
+	body := strings.NewReader(`{"name": "new user name"}`)
+	request, _ := http.NewRequest("PUT", "/users/1", body)
+	s.mux.ServeHTTP(s.writer, request)
+
+	c.Check(s.writer.Code, Equals, 204)
+
+	getRouter := s.mux.Methods(http.MethodGet).Subrouter()
+	getRouter.HandleFunc("/users/{id:[0-9]+}", s.userHandler.ListSingle)
+
+	request, _ = http.NewRequest("GET", "/users/1", nil)
+	s.writer = httptest.NewRecorder()
+	s.mux.ServeHTTP(s.writer, request)
+
+	c.Check(s.writer.Code, Equals, 200)
+	json.Unmarshal(s.writer.Body.Bytes(), s.user)
+	c.Check(s.user.Name, Equals, "new user name")
+}
