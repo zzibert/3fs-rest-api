@@ -17,7 +17,7 @@ import (
 	. "gopkg.in/check.v1"
 )
 
-// Creates test suite
+// Creates group test suite
 type GroupTestSuite struct {
 	groupHandler *handlers.Groups
 	group        *data.Group
@@ -25,6 +25,16 @@ type GroupTestSuite struct {
 	mux          *mux.Router
 	l            *log.Logger
 	db           *gorm.DB
+}
+
+// Creates user test suite
+type UserTestSuite struct {
+	userHandler *handlers.Users
+	user        *data.User
+	writer      *httptest.ResponseRecorder
+	mux         *mux.Router
+	l           *log.Logger
+	db          *gorm.DB
 }
 
 // Registering test suite
@@ -42,6 +52,10 @@ func init() {
 		l:  l,
 		db: db,
 	})
+	Suite(&UserTestSuite{
+		l:  l,
+		db: db,
+	})
 }
 
 // integrates with testing package
@@ -56,6 +70,18 @@ func (s *GroupTestSuite) SetUpTest(c *C) {
 }
 
 func (s *GroupTestSuite) TearDownTest(c *C) {
+	clearDB(s.db)
+}
+
+func (s *UserTestSuite) SetUpTest(c *C) {
+	s.writer = httptest.NewRecorder()
+	s.user = &data.User{}
+	s.mux = mux.NewRouter()
+	s.userHandler = handlers.NewUsers(s.l, s.db)
+	setDB(s.db)
+}
+
+func (s *UserTestSuite) TearDownTest(c *C) {
 	clearDB(s.db)
 }
 
