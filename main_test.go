@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/gorilla/mux"
@@ -27,7 +28,7 @@ type GroupTestSuite struct {
 
 // Registering test suite
 func init() {
-	connection := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", "localhost", "5432", "zanzibert", "nekineki", "postgres")
+	connection := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", "localhost", "5433", "zanzibert", "nekineki", "test")
 
 	// Opening a connection to the postgres database
 	db, err := gorm.Open("postgres", connection)
@@ -47,9 +48,12 @@ func Test(t *testing.T) { TestingT(t) }
 
 func (s *GroupTestSuite) SetUpSuite(c *C) {
 	s.mux = mux.NewRouter()
+	s.groupHandler = handlers.NewGroups(s.l, s.db)
+}
+
+func (s *GroupTestSuite) SetUpTest(c *C) {
 	s.writer = httptest.NewRecorder()
 	s.group = &data.Group{}
-	s.groupHandler = handlers.NewGroups(s.l, s.db)
 }
 
 func clearDB(db *gorm.DB) {
@@ -72,20 +76,21 @@ func (s *GroupTestSuite) TestGroupHandleGetSingleFail(c *C) {
 	request, _ := http.NewRequest("GET", "/groups/1", nil)
 	s.mux.ServeHTTP(s.writer, request)
 
-	c.Check(s.writer.Code, Equals, 200)
+	c.Check(s.writer.Code, Equals, 404)
 }
 
-// func (s *GroupTestSuite) TestGroupHandlePost(c *C) {
-// 	postRouter := s.mux.Methods(http.MethodPost).Subrouter()
-// 	postRouter.HandleFunc("/groups", s.groupHandler.Create)
+// Tries to create a new group
+func (s *GroupTestSuite) TestGroupHandlePost(c *C) {
+	postRouter := s.mux.Methods(http.MethodPost).Subrouter()
+	postRouter.HandleFunc("/groups", s.groupHandler.Create)
 
-// 	body := strings.NewReader(`{"name": "group 1"}`)
-// 	request, _ := http.NewRequest("POST", "/groups", body)
-// 	s.mux.ServeHTTP(s.writer, request)
+	body := strings.NewReader(`{"name": "group 1"}`)
+	request, _ := http.NewRequest("POST", "/groups", body)
+	s.mux.ServeHTTP(s.writer, request)
 
-// 	c.Check(s.writer.Code, Equals, 200)
+	c.Check(s.writer.Code, Equals, 200)
 
-// }
+}
 
 // func (s *GroupTestSuite) TestGroupHandleGetSingle(c *C) {
 
